@@ -1,13 +1,6 @@
-import DataGrid from "@/DataGrid";
 
-const DataGridMain = {
-    install(Vue) {
-        Vue.component('data-grid', DataGrid);
-    }
-};
+export const Framework = {};
 
-if (typeof window !== 'undefined' && window.Vue) {
-    window.Vue.use(DataGridMain);
+Framework.install = function (Vue) {
+    Vue.component('data-grid', require('./DataGrid').default);
 }
-
-export default DataGridMain;
