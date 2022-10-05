@@ -10,7 +10,6 @@
   "repository": "https://github.com/EA-Wardie/data-grid-vue",
   "keywords": ["vue", "table", "data", "grid", "data-grid", "vue-grid"],
   "license": "MIT",
-  "files": ["dist"],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
