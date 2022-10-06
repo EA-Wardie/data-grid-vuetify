@@ -1,6 +1,6 @@
 
-export const Framework = {};
+export const DataGrid = {};
 
-Framework.install = function (Vue) {
+DataGrid.install = function (Vue) {
     Vue.component('data-grid', require('./DataGrid').default);
 }
