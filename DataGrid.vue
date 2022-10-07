@@ -399,7 +399,7 @@
                 default: false,
             },
             itemValue: {
-                type: [String, null],
+                type: String | null,
                 default: null,
             },
             returnObject: {

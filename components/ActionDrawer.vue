@@ -50,7 +50,7 @@
                 required: true,
             },
             height: {
-                type: [String, Number],
+                type: String | Number,
                 required: true,
             },
             actions: {

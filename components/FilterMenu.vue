@@ -167,7 +167,7 @@
         mixins: [filters],
         props: {
             data: {
-                type: [Object, Array],
+                type: Object | Array,
                 required: true,
             },
             columns: {

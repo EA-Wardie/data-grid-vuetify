@@ -77,7 +77,7 @@
                 required: true,
             },
             sortBy: {
-                type: [Object, Array],
+                type: Object | Array,
                 required: true,
             },
         },

@@ -126,7 +126,7 @@
         components: {},
         props: {
             item: {
-                type: [String, Number, null],
+                type: String | Number | null,
                 required: true,
             },
             column: {
