@@ -81,7 +81,6 @@
 
                 if (this.data.queries[recommendation.value]) {
                     if (!this.data.queries[recommendation.value].includes(this.data.term)) {
-                        // eslint-disable-next-line vue/no-mutating-props
                         this.data.queries[recommendation.value].push(this.data.term);
                     } else {
                         const index = this.data.queries[recommendation.value].findIndex((value) => value === this.data.term);

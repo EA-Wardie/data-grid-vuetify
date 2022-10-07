@@ -1,4 +1,3 @@
-<!--eslint-disable-->
 <template>
     <div>
         <v-card tile
@@ -19,23 +18,23 @@
                             >
                                 <template #activator="{ on }">
                                     <v-badge
-                                        bordered
-                                        color="grey"
-                                        overlap
-                                        :content="totalCurrentSearches()"
-                                        :value="!Array.isArray(afterPostQueries) && totalCurrentSearches() > 0"
+                                            bordered
+                                            color="grey"
+                                            overlap
+                                            :content="totalCurrentSearches()"
+                                            :value="!Array.isArray(afterPostQueries) && totalCurrentSearches() > 0"
                                     >
                                         <div v-on="on">
                                             <v-text-field
-                                                outlined
-                                                hide-details
-                                                clearable
-                                                prepend-inner-icon="mdi-magnify"
-                                                placeholder="Search"
-                                                style="width: 600px;"
-                                                v-model="data.metaData.search.term"
-                                                @click:clear="clearSearch()"
-                                                @input="debouncedInitialSearch()"
+                                                    outlined
+                                                    hide-details
+                                                    clearable
+                                                    prepend-inner-icon="mdi-magnify"
+                                                    placeholder="Search"
+                                                    style="width: 600px;"
+                                                    v-model="data.metaData.search.term"
+                                                    @click:clear="clearSearch()"
+                                                    @input="debouncedInitialSearch()"
                                             >
                                                 <template #append v-if="advancedColumns.length > 0">
                                                     <v-menu bottom
@@ -58,12 +57,12 @@
                                                         </template>
                                                         <v-card :width="500">
                                                             <filter-menu
-                                                                :data="meta.filters"
-                                                                :columns="meta.columns"
-                                                                :has-layout="hasLayout"
-                                                                v-if="menus.filter"
-                                                                @filters="applyFilters($event)"
-                                                                @clear="clearFilters()"
+                                                                    :data="meta.filters"
+                                                                    :columns="meta.columns"
+                                                                    :has-layout="hasLayout"
+                                                                    v-if="menus.filter"
+                                                                    @filters="applyFilters($event)"
+                                                                    @clear="clearFilters()"
                                                             ></filter-menu>
                                                         </v-card>
                                                     </v-menu>
@@ -83,11 +82,11 @@
                                 </template>
                                 <v-card :width="500">
                                     <search-menu
-                                        :value="menus.search"
-                                        :data="meta.search"
-                                        :columns="meta.columns"
-                                        v-if="menus.search"
-                                        @search="applySearch($event)"
+                                            :value="menus.search"
+                                            :data="meta.search"
+                                            :columns="meta.columns"
+                                            v-if="menus.search"
+                                            @search="applySearch($event)"
                                     ></search-menu>
                                 </v-card>
                             </v-menu>
@@ -96,15 +95,15 @@
                 </v-col>
                 <v-col cols="auto" class="flex-grow-1">
                     <header-filter-section
-                        :current-total-items="items.length"
-                        :meta-data="meta"
-                        v-if="page.innerWidth > 1299"
-                        @layout="applyLayout($event)"
-                        @pageDown="pageDown()"
-                        @pageUp="pageUp()"
-                        @sort="applySortBy($event)"
-                        @view="applyView($event)"
-                        @goToPage="goToPage($event)"
+                            :current-total-items="items.length"
+                            :meta-data="meta"
+                            v-if="page.innerWidth > 1299"
+                            @layout="applyLayout($event)"
+                            @pageDown="pageDown()"
+                            @pageUp="pageUp()"
+                            @sort="applySortBy($event)"
+                            @view="applyView($event)"
+                            @goToPage="goToPage($event)"
                     ></header-filter-section>
                     <v-row no-gutters justify="end" align="center" class="fill-height" v-else>
                         <v-col cols="auto">
@@ -116,14 +115,14 @@
                                 </template>
                                 <v-card class="px-2">
                                     <header-filter-section
-                                        :current-total-items="data.items.length"
-                                        :meta-data="meta"
-                                        @layout="applyLayout($event)"
-                                        @pageDown="pageDown()"
-                                        @pageUp="pageUp()"
-                                        @sort="applySortBy($event)"
-                                        @view="applyView($event)"
-                                        @goToPage="goToPage($event)"
+                                            :current-total-items="data.items.length"
+                                            :meta-data="meta"
+                                            @layout="applyLayout($event)"
+                                            @pageDown="pageDown()"
+                                            @pageUp="pageUp()"
+                                            @sort="applySortBy($event)"
+                                            @view="applyView($event)"
+                                            @goToPage="goToPage($event)"
                                     ></header-filter-section>
                                 </v-card>
                             </v-menu>
@@ -133,9 +132,13 @@
             </v-row>
         </v-card>
         <div style="margin-top: 72px;">
-            <app-header>
-                <slot name="title">Items</slot>
-                <template #action>
+            <v-row no-gutters justify="space-between" align="center">
+                <v-col cols="auto">
+                    <slot name="title">
+                        <div class="title">Items</div>
+                    </slot>
+                </v-col>
+                <v-col cols="auto">
                     <v-row no-gutters justify="end" align="center">
                         <v-col cols="auto" v-if="hasFilters">
                             <v-icon color="#2EA2EF">mdi-information</v-icon>
@@ -158,8 +161,8 @@
                             </v-badge>
                         </v-col>
                     </v-row>
-                </template>
-            </app-header>
+                </v-col>
+            </v-row>
             <v-row no-gutters class="flex-nowrap">
                 <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? 'calc(100% - 266px)' : '100%' }">
                     <v-card class="overflow-hidden rounded" style="position: relative;" :loading="loading" :disabled="loading">
@@ -169,14 +172,14 @@
                                 <tr>
                                     <th class="px-2" style="width: 1%;" v-if="selectable">
                                         <v-simple-checkbox
-                                            style="transform: translateX(4px);"
-                                            class="ma-0 pa-0"
-                                            color="secondary"
-                                            :disabled="items.length === 0"
-                                            :value="selectedItems.length === items.length && items.length !== 0"
-                                            :indeterminate="selectedItems.length > 0 && selectedItems.length < items.length"
-                                            v-ripple="false"
-                                            @input="selectAllItems()"
+                                                style="transform: translateX(4px);"
+                                                class="ma-0 pa-0"
+                                                color="secondary"
+                                                :disabled="items.length === 0"
+                                                :value="selectedItems.length === items.length && items.length !== 0"
+                                                :indeterminate="selectedItems.length > 0 && selectedItems.length < items.length"
+                                                v-ripple="false"
+                                                @input="selectAllItems()"
                                         ></v-simple-checkbox>
                                     </th>
                                     <th :key="index"
@@ -210,12 +213,12 @@
                                         v-if="selectable"
                                     >
                                         <v-simple-checkbox
-                                            style="transform: translateX(4px);"
-                                            class="ma-0 pa-0"
-                                            color="primary"
-                                            :value="item.selected"
-                                            v-ripple="false"
-                                            @input="setSelectedItem(item)"
+                                                style="transform: translateX(4px);"
+                                                class="ma-0 pa-0"
+                                                color="primary"
+                                                :value="item.selected"
+                                                v-ripple="false"
+                                                @input="setSelectedItem(item)"
                                         ></v-simple-checkbox>
                                     </td>
                                     <td :key="colIndex"
@@ -230,11 +233,12 @@
                                               :column="column"
                                               :column-index="colIndex"
                                               :item="item"
-                                              :item-index="rowIndex">
+                                              :item-index="rowIndex"
+                                        >
                                             <row-column-value
-                                                :item="item"
-                                                :column="column"
-                                                :hyperlinks="!!meta.hyperlinks"
+                                                    :item="item"
+                                                    :column="column"
+                                                    :hyperlinks="!!meta.hyperlinks"
                                             ></row-column-value>
                                         </slot>
                                     </td>
@@ -256,12 +260,12 @@
                                                 <v-card width="100%">
                                                     <div :key="index" v-for="(action, index) in actions">
                                                         <v-list-item
-                                                            dense
-                                                            :class="!!action.color ? `${action.color}--text` : 'black--text'"
-                                                            :color="action.color || 'primary'"
-                                                            :disabled="action.disabled || false"
-                                                            v-if="!!action.show ? action.show(item) : true"
-                                                            @click="action.confirmation ? confirmClosure(action, item) : action.closure(item)"
+                                                                dense
+                                                                :class="!!action.color ? `${action.color}--text` : 'black--text'"
+                                                                :color="action.color || 'primary'"
+                                                                :disabled="action.disabled || false"
+                                                                v-if="!!action.show ? action.show(item) : true"
+                                                                @click="action.confirmation ? confirmClosure(action, item) : action.closure(item)"
                                                         >
                                                             <v-list-item-content>
                                                                 <v-list-item-title>{{ action.label }}</v-list-item-title>
@@ -325,10 +329,10 @@
                 </v-col>
                 <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? '266px' : '0px' }">
                     <action-drawer
-                        :value="additionalActionDrawer"
-                        :height="page.innerHeight - 230"
-                        :actions="additionalActions"
-                        :selected-items="selectedItems"
+                            :value="additionalActionDrawer"
+                            :height="page.innerHeight - 230"
+                            :actions="additionalActions"
+                            :selected-items="selectedItems"
                     >
                         <template #title>
                             <slot name="actionDrawerTitle"></slot>
@@ -340,6 +344,19 @@
                 </v-col>
             </v-row>
         </div>
+        <v-dialog persistent :max-width="600" v-model="actionClosure.show">
+            <v-card v-if="actionClosure && actionClosure.action">
+                <v-card-text class="pb-4 px-4 pt-3">
+                    <div class="title mb-3 black--text">Confirm</div>
+                    <div>{{ actionClosure.action.confirmation || 'Are you sure you\'d like to continue?' }}</div>
+                </v-card-text>
+                <v-card-actions class="pb-4 px-4">
+                    <v-spacer></v-spacer>
+                    <v-btn text color="grey" dark @click="closeActionClosure()">Cancel</v-btn>
+                    <v-btn text :color="actionClosure.action.color || 'primary'" @click="closure()">Confirm</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -406,7 +423,6 @@
                 return this.data.metaData;
             },
             orderedColumns() {
-                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                 return this.meta.columns.sort((a, b) => (a.index > b.index) ? 1 : ((b.index > a.index) ? -1 : 0));
             },
             hasSearch() {
@@ -461,6 +477,11 @@
                 },
                 additionalActionDrawer: false,
                 loading: false,
+                actionClosure: {
+                    show: false,
+                    item: null,
+                    action: null,
+                },
                 afterPostQueries: {},
             };
         },
@@ -663,7 +684,7 @@
             },
             post(clear = false) {
                 const data = this.getPostDataBasedOnStates(),
-                    btoa = Buffer.from(JSON.stringify(data), 'utf8').toString('base64');
+                        btoa = Buffer.from(JSON.stringify(data), 'utf8').toString('base64');
 
                 let payload = {};
                 if (!clear) {
@@ -683,15 +704,15 @@
             },
             postChanges(action, data = {}, clear = false, preserve = true) {
                 this.$inertia.post(
-                    this.$route(`webapi.datadisplaysystem.${action}`, [this.meta.tableRef]),
-                    data,
-                    {
-                        preserveScroll: true,
-                        preserveState: preserve,
-                        onSuccess: () => {
-                            this.afterPromise(clear);
-                        },
-                    }
+                        this.$route(`webapi.datadisplaysystem.${action}`, [this.meta.tableRef]),
+                        data,
+                        {
+                            preserveScroll: true,
+                            preserveState: preserve,
+                            onSuccess: () => {
+                                this.afterPromise(clear);
+                            },
+                        }
                 );
             },
             openSearchMenu() {
@@ -700,37 +721,37 @@
             closeSearchMenu() {
                 this.menus.search = false;
             },
-            openFilterMenu() {
-                this.menus.filter = true;
-            },
             closeFilterMenu() {
                 this.menus.filter = false;
             },
             confirmClosure(action, item) {
-                this.$dialog({
-                    title: 'Confirm',
-                    content: action.confirmation,
-                    buttons: {
-                        cancel: {
-                            label: 'Cancel',
-                            color: 'black',
-                        },
-                        confirm: {
-                            label: 'Confirm',
-                            color: 'primary',
-                        },
-                    },
-                }).then(
-                    (resp) => {
-                        if (resp === 'confirm') {
-                            action.closure(item);
-                        }
-                    },
-                );
-            }
+                this.actionClosure.action = action;
+                this.actionClosure.item = item;
+                setTimeout(() => {
+                    this.actionClosure.show = true;
+                }, 0);
+            },
+            closeActionClosure() {
+                this.actionClosure = {
+                    show: false,
+                    item: null,
+                    action: null,
+                };
+            },
+            closure() {
+                this.actionClosure.action.closure(this.actionClosure.item);
+                this.actionClosure.show = false;
+
+                setTimeout(() => {
+                    this.actionClosure = {
+                        show: false,
+                        item: null,
+                        action: null,
+                    };
+                }, 250);
+            },
         },
         mounted() {
-            console.log(this.data);
             this.setPageSizes();
         },
         beforeMount() {
@@ -743,7 +764,7 @@
         },
         beforeDestroy() {
             this.destroyEvents();
-        }
+        },
     }
 </script>
 

@@ -1,6 +1,6 @@
 {
   "name": "data-grid-vuetify",
-  "description": "Front-end complementary package for the Laravel data-grid package of the same name.",
+  "description": "Front-end complementary package for the data-grid-laravel package of the same name.",
   "version": "0.1.0",
   "main" : "index.js",
   "author": {
@@ -15,5 +15,15 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
+  },
+  "devDependencies": {
+    "vue": "^2.6.14",
+    "vuetify": "^2.6.4",
+    "moment": "^2.29.3"
+  },
+  "dependencies": {
+    "vuedraggable": "^2.23.2",
+    "@inertiajs/inertia": "^0.11.0",
+    "@inertiajs/inertia-vue": "^0.8.0"
   }
 }

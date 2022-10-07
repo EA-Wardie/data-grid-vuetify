@@ -20,8 +20,8 @@
                         <slot></slot>
                     </div>
                     <v-divider></v-divider>
-                    <template v-if="!!action.show ? action.show : true">
-                        <div :key="index" v-for="(action, index) in actions">
+                    <div :key="index" v-for="(action, index) in actions">
+                        <div v-if="!!action.show ? action.show : true">
                             <v-btn block
                                    tile
                                    text
@@ -34,7 +34,7 @@
                             </v-btn>
                             <v-divider></v-divider>
                         </div>
-                    </template>
+                    </div>
                 </div>
             </v-card>
         </div>
