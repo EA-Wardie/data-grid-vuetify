@@ -704,7 +704,7 @@
             },
             postChanges(action, data = {}, clear = false, preserve = true) {
                 this.$inertia.post(
-                        this.$route(`webapi.datadisplaysystem.${action}`, [this.meta.tableRef]),
+                        this.$route(`datagrid.${action}`, [this.meta.tableRef]),
                         data,
                         {
                             preserveScroll: true,
