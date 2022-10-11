@@ -132,7 +132,7 @@
             </v-row>
         </v-card>
         <div style="margin-top: 72px;">
-            <v-row no-gutters justify="space-between" align="center">
+            <v-row no-gutters justify="space-between" align="center" class="mb-3">
                 <v-col cols="auto">
                     <slot name="title">
                         <div class="title">Items</div>
