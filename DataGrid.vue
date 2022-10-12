@@ -21,8 +21,8 @@
                                             bordered
                                             color="grey"
                                             overlap
-                                            :content="totalCurrentSearches()"
-                                            :value="!Array.isArray(afterPostQueries) && totalCurrentSearches() > 0"
+                                            :content="totalCurrentSearches + totalCurrentFilters"
+                                            :value="(!Array.isArray(afterPostQueries) && totalCurrentSearches > 0) || totalCurrentFilters > 0"
                                     >
                                         <div v-on="on">
                                             <v-text-field
@@ -147,8 +147,8 @@
                             <div>Filters are active in this view</div>
                         </v-col>
                         <v-col cols="auto" v-show="!hideAdditionalActions">
-                            <v-badge color="primary" bordered overlap :content="selectedItems.length" :value="selectedItems.length > 0">
-                                <v-tooltip color="grey" left :nudge-right="5" :disabled="selectedItems.length === 0">
+                            <v-badge color="primary" bordered overlap :content="Object.keys(selectedMap).length" :value="Object.keys(selectedMap).length > 0">
+                                <v-tooltip color="grey" left :nudge-right="5" :disabled="Object.keys(selectedMap).length === 0">
                                     <template #activator="{ on }">
                                         <v-btn icon v-on="on" @click="additionalActionDrawer = !additionalActionDrawer">
                                             <v-icon :color="additionalActionDrawer ? 'primary' : ''"
@@ -156,7 +156,7 @@
                                             </v-icon>
                                         </v-btn>
                                     </template>
-                                    <div>With {{ selectedItems.length }} Selected</div>
+                                    <div>With {{ Object.keys(selectedMap).length }} Selected</div>
                                 </v-tooltip>
                             </v-badge>
                         </v-col>
@@ -201,7 +201,7 @@
                                     <th style="width: 1%;"
                                         class="px-2"
                                         :style="{ borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '' }"
-                                        v-if="actions.length > 0"
+                                        v-show="items.length > 0 && actions.length > 0"
                                     ></th>
                                 </tr>
                                 </thead>
@@ -248,13 +248,13 @@
                                             borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '',
                                             borderBottom: segmented && rowIndex === items.length - 1 ? '1px solid rgba(0,0,0,0.12)' : ''
                                         }"
-                                        v-if="actions.length > 0"
+                                        v-show="items.length > 0 && actions.length > 0"
                                     >
                                         <div v-if="actions.length > 1">
                                             <v-menu bottom :nudge-bottom="32" :min-width="120">
                                                 <template #activator="{ on, value }">
                                                     <v-btn icon small color="primary" v-on="on">
-                                                        <v-icon small>{{ value ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
+                                                        <v-icon small>{{ value ? 'mdi-dots-horizontal' : 'mdi-dots-vertical' }}</v-icon>
                                                     </v-btn>
                                                 </template>
                                                 <v-card width="100%">
@@ -307,20 +307,24 @@
                                         </v-row>
                                     </div>
                                     <div class="text-center" v-if="hasFilters || hasSearch">
-                                        <div>Filters you have applied did not return any results.</div>
-                                        <div>Please change or remove the filters completely.</div>
-                                        <v-btn block
-                                               class="mt-4"
-                                               color="grey"
-                                               :disabled="loading"
-                                               :dark="!loading"
-                                               @click="applyClear()"
-                                        >Clear Filters
-                                        </v-btn>
+                                        <slot name="noItemsWithFilters">
+                                            <div>Filters you have applied did not return any results.</div>
+                                            <div>Please change or remove the filters completely.</div>
+                                            <v-btn block
+                                                   class="mt-4"
+                                                   color="grey"
+                                                   :disabled="loading"
+                                                   :dark="!loading"
+                                                   @click="applyClear()"
+                                            >Clear Filters
+                                            </v-btn>
+                                        </slot>
                                     </div>
                                     <div class="text-center" v-else>
-                                        <div>This page does not have any data yet.</div>
-                                        <div>Please check back soon!</div>
+                                        <slot name="noItems">
+                                            <div>This page does not have any data yet.</div>
+                                            <div>Please check back soon!</div>
+                                        </slot>
                                     </div>
                                 </v-col>
                             </v-row>
@@ -332,7 +336,7 @@
                             :value="additionalActionDrawer"
                             :height="page.innerHeight - 230"
                             :actions="additionalActions"
-                            :selected-items="selectedItems"
+                            :selected-items="returnObject ? Object.values(selectedMap) : Object.keys(selectedMap)"
                     >
                         <template #title>
                             <slot name="actionDrawerTitle"></slot>
@@ -347,13 +351,26 @@
         <v-dialog persistent :max-width="600" v-model="actionClosure.show">
             <v-card v-if="actionClosure && actionClosure.action">
                 <v-card-text class="pb-4 px-4 pt-3">
-                    <div class="title mb-3 black--text">Confirm</div>
-                    <div>{{ actionClosure.action.confirmation || 'Are you sure you\'d like to continue?' }}</div>
+                    <div class="title mb-3 black--text">
+                        {{ confirmAction.title }}
+                    </div>
+                    <div>
+                        {{ confirmAction.text }}
+                    </div>
                 </v-card-text>
                 <v-card-actions class="pb-4 px-4">
                     <v-spacer></v-spacer>
-                    <v-btn text color="grey" dark @click="closeActionClosure()">Cancel</v-btn>
-                    <v-btn text :color="actionClosure.action.color || 'primary'" @click="closure()">Confirm</v-btn>
+                    <v-btn text
+                           :color="confirmAction.buttons.cancel.color"
+                           dark
+                           @click="closeActionClosure()"
+                    >{{ confirmAction.buttons.cancel.text }}
+                    </v-btn>
+                    <v-btn text
+                           :color="confirmAction.buttons.confirm.color"
+                           @click="closure()"
+                    >{{ confirmAction.buttons.confirm.text }}
+                    </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -426,7 +443,7 @@
                 return this.meta.columns.sort((a, b) => (a.index > b.index) ? 1 : ((b.index > a.index) ? -1 : 0));
             },
             hasSearch() {
-                return (!!this.meta.search && !!this.meta.search.term && !!this.afterPostQueries && Object.keys(this.afterPostQueries).length > 0);
+                return (!!this.meta.search && !!this.afterPostQueries && Object.keys(this.afterPostQueries).length > 0);
             },
             hasFilters() {
                 return (Object.keys(this.meta.filters).length > 0);
@@ -438,17 +455,65 @@
                 return this.items.filter(({selected}) => selected);
             },
             advancedColumns() {
-                return this.meta.columns.filter(({isAdvanced, hidden}) => isAdvanced && !hidden);
+                return this.meta.columns.filter(({isAdvanced, hidden, iconMap}) => (isAdvanced && !hidden) || iconMap.length > 0);
+            },
+            currentSearches() {
+                return Object.values(this.afterPostQueries).reduce((carry, terms) => carry.concat(terms), []);
+            },
+            totalCurrentSearches() {
+                return this.currentSearches.length;
+            },
+            totalCurrentFilters() {
+                return Object.keys(this.meta.filters).length;
+            },
+            confirmAction() {
+                if (!!this.actionClosure && !!this.actionClosure.action && !!this.actionClosure.action.confirmation) {
+                    if (typeof this.actionClosure.action.confirmation !== 'string') {
+                        const buttons = this.actionClosure.action.confirmation.buttons;
+
+                        return {
+                            title: this.actionClosure.action.confirmation.title || 'Confirm',
+                            text: this.actionClosure.action.confirmation.text || 'Are you sure you\'d like perform this action?',
+                            buttons: {
+                                cancel: {
+                                    text: !!buttons.cancel ? buttons.cancel.text : 'Cancel',
+                                    color: !!buttons.cancel ? buttons.cancel.color : 'black',
+                                },
+                                confirm: {
+                                    text: !!buttons.confirm ? buttons.confirm.text : 'Confirm',
+                                    color: !!buttons.confirm ? buttons.confirm.color : 'primary',
+                                },
+                            },
+                        };
+                    } else {
+                        return {
+                            title: 'Confirm',
+                            text: this.actionClosure.action.confirmation,
+                            buttons: {
+                                cancel: {
+                                    text: 'Cancel',
+                                    color: 'black',
+                                },
+                                confirm: {
+                                    text: 'Confirm',
+                                    color: 'error',
+                                },
+                            },
+                        };
+                    }
+                }
+
+                return {};
             },
         },
         watch: {
-            selectedItems(val) {
+            selectedMap(val) {
                 if (this.selectable) {
                     if (!this.itemValue) {
                         console.error('Prop "item-value" is required when using selectable.');
                     } else {
                         if (!this.returnObject) {
-                            this.$emit('input', val.pluck(this.itemValue));
+                            this.$emit('input', val[this.itemValue]);
                         } else {
                             this.$emit('input', val);
                         }
@@ -483,6 +548,7 @@
                     action: null,
                 },
                 afterPostQueries: {},
+                selectedMap: {},
             };
         },
         methods: {
@@ -498,17 +564,25 @@
             },
             setSelectedItem(item) {
                 this.$set(item, 'selected', !item.selected);
+                this.$set(this.selectedMap, item[this.itemValue], item);
             },
             selectAllItems() {
                 if (this.selectedItems.length === this.items.length) {
                     this.items.forEach((item) => {
                         this.$set(item, 'selected', false);
                     });
+                    this.selectedMap = {};
                 } else {
                     this.items.forEach((item) => {
                         this.$set(item, 'selected', true);
+                        this.$set(this.selectedMap, item[this.itemValue], item);
                     });
                 }
+            },
+            setActiveItems() {
+                this.items.map((item) => {
+                    this.$set(item, 'selected', !!this.selectedMap[item[this.itemValue]]);
+                });
             },
             updateMeta(key, value) {
                 this.$set(this.data.metaData, key, value);
@@ -521,23 +595,26 @@
                     this.updateMetaSubValue('search', 'queries', {});
                 }
             },
-            currentSearches() {
-                return Object.values(this.afterPostQueries).reduce((carry, terms) => carry.concat(terms), []);
-            },
-            totalCurrentSearches() {
-                return this.currentSearches().length;
-            },
             termsString(query) {
                 return query.reduce((carry, term, index) => index === 0 ? carry + term : carry + `, ${term}`, '');
             },
             getColumnLabel(query) {
                 const column = this.meta.columns.find((column) => {
                     const value = column['isRaw'] ? column['value'] : column['rawValue'];
+
                     return value === query;
                 });
 
                 if (column) {
                     return column.label;
+                } else {
+                    const column = this.meta.columns.find((column) => {
+                        return query.split('.')[1] === column['subtitle'];
+                    });
+
+                    if (column) {
+                        return `${column.label} subtitle`;
+                    }
                 }
 
                 return '';
@@ -695,9 +772,10 @@
 
                 this.$inertia.reload({
                     data: payload,
-                    preserveState: false,
+                    // preserveState: false,
                     preserveScroll: true,
                     onSuccess: () => {
+                        this.setActiveItems();
                         this.afterPromise(clear);
                     },
                 });
@@ -710,6 +788,7 @@
                             preserveScroll: true,
                             preserveState: preserve,
                             onSuccess: () => {
+                                this.setActiveItems();
                                 this.afterPromise(clear);
                             },
                         }

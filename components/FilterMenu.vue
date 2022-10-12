@@ -11,132 +11,136 @@
                         <div class="subtitle-2" style="white-space: nowrap;">{{ column.label }}{{ !!column.iconConditionRawValue ? ' (icon)' : '' }}</div>
                     </td>
                     <td class="py-2 pl-3">
-                        <div v-if="column.type === 'enum'">
-                            <v-autocomplete
-                                dense
-                                outlined
-                                label="Value"
-                                hide-details
-                                clearable
-                                :items="getEnumValues(column.enumerators)"
-                                :value="!!filters[column.rawValue] ? filters[column.rawValue].value : null"
-                                @input="selectEnum(column.rawValue, $event)"
-                                @click:clear="clearEnum(column.rawValue)"
-                            ></v-autocomplete>
-                        </div>
-                        <div v-else-if="column.type === 'number' || column.type === 'perc'">
-                            <v-row dense class="flex-nowrap">
-                                <v-col cols="4">
+                        <v-row no-gutters justify="end">
+                            <v-col cols="auto">
+                                <div v-if="column.type === 'enum'">
                                     <v-autocomplete
-                                        dense
-                                        outlined
-                                        label="Operator"
-                                        hide-details
-                                        :items="numberOperators"
-                                        :value="!!filters[column.rawValue] ? filters[column.rawValue].operator : null"
-                                        @input="selectOperator(column.rawValue, $event)"
-                                    ></v-autocomplete>
-                                </v-col>
-                                <v-col cols="8">
-                                    <v-text-field
-                                        hide-spin-buttons
-                                        prepend-inner-icon="mdi-counter"
-                                        hide-details
-                                        dense
-                                        outlined
-                                        clearable
-                                        type="number"
-                                        :value="!!filters[column.rawValue] ? filters[column.rawValue].value : null"
-                                        :label="column.type === 'number' ? 'Value' : 'Percentage'"
-                                        :disabled="!filters[column.rawValue] || !filters[column.rawValue].operator"
-                                        @input="selectNumber(column.rawValue, $event, column.type)"
-                                        @click:clear="clearOperator(column.rawValue)"
-                                    ></v-text-field>
-                                </v-col>
-                            </v-row>
-                        </div>
-                        <div v-else-if="column.type === 'timestamp'">
-                            <v-row dense class="flex-nowrap">
-                                <v-col cols="4">
-                                    <v-autocomplete
-                                        dense
-                                        outlined
-                                        label="Operator"
-                                        hide-details
-                                        :items="timestampOperators"
-                                        :value="!!filters[column.rawValue] ? filters[column.rawValue].operator : null"
-                                        @input="selectOperator(column.rawValue, $event)"
-                                    ></v-autocomplete>
-                                </v-col>
-                                <v-col cols="8">
-                                    <v-menu
-                                        transition="scale-transition"
-                                        offset-y
-                                        min-width="auto"
-                                        :close-on-content-click="false"
-                                        v-model="pickers[column.rawValue]"
-                                    >
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-text-field
-                                                label="Date"
-                                                prepend-inner-icon="mdi-calendar"
-                                                readonly
-                                                hide-details
-                                                dense
-                                                outlined
-                                                clearable
-                                                :disabled="!filters[column.rawValue] || !filters[column.rawValue].operator"
-                                                :value="getFormattedTimestampValue(column.rawValue)"
-                                                v-bind="attrs"
-                                                v-on="on"
-                                                @click:clear="clearOperator(column.rawValue)"
-                                            ></v-text-field>
-                                        </template>
-                                        <v-date-picker
-                                            color="primary"
+                                            dense
+                                            outlined
+                                            label="Value"
+                                            hide-details
+                                            clearable
+                                            :items="getEnumValues(column.enumerators)"
                                             :value="!!filters[column.rawValue] ? filters[column.rawValue].value : null"
-                                            @input="selectTimestamp(column.rawValue, $event)"
-                                        ></v-date-picker>
-                                    </v-menu>
-                                </v-col>
-                            </v-row>
-                        </div>
-                        <div v-else-if="column.type === 'icon' || (!!column.iconConditionRawValue)">
-                            <v-menu bottom :max-width="50" :nudge-right="46">
-                                <template #activator="{ on }">
-                                    <v-row no-gutters align="center" class="flex-nowrap">
-                                        <v-col cols="auto">
-                                            <div class="rounded"
-                                                 style="border: 1px solid rgba(0,0,0,0.4); width: 40px; height: 40px; cursor: pointer; padding: 6px;"
-                                                 v-ripple v-on="on"
-                                            >
-                                                <v-icon :color="getSelectedIcon(column).color" v-if="!!getSelectedIcon(column)">
-                                                    {{ composeIcon(getSelectedIcon(column).icon) }}
-                                                </v-icon>
-                                            </div>
+                                            @input="selectEnum(column.rawValue, $event)"
+                                            @click:clear="clearEnum(column.rawValue)"
+                                    ></v-autocomplete>
+                                </div>
+                                <div v-else-if="column.type === 'number' || column.type === 'perc'">
+                                    <v-row dense class="flex-nowrap">
+                                        <v-col cols="4">
+                                            <v-autocomplete
+                                                    dense
+                                                    outlined
+                                                    label="Operator"
+                                                    hide-details
+                                                    :items="numberOperators"
+                                                    :value="!!filters[column.rawValue] ? filters[column.rawValue].operator : null"
+                                                    @input="selectOperator(column.rawValue, $event)"
+                                            ></v-autocomplete>
                                         </v-col>
-                                        <v-col cols="auto" class="pl-1">
-                                            <v-scroll-x-transition hide-on-leave>
-                                                <v-btn small icon v-if="!!getSelectedIcon(column)" @click="clearIcon(column)">
-                                                    <v-icon>mdi-close</v-icon>
-                                                </v-btn>
-                                            </v-scroll-x-transition>
+                                        <v-col cols="8">
+                                            <v-text-field
+                                                    hide-spin-buttons
+                                                    prepend-inner-icon="mdi-counter"
+                                                    hide-details
+                                                    dense
+                                                    outlined
+                                                    clearable
+                                                    type="number"
+                                                    :value="!!filters[column.rawValue] ? filters[column.rawValue].value : null"
+                                                    :label="column.type === 'number' ? 'Value' : 'Percentage'"
+                                                    :disabled="!filters[column.rawValue] || !filters[column.rawValue].operator"
+                                                    @input="selectNumber(column.rawValue, $event, column.type)"
+                                                    @click:clear="clearOperator(column.rawValue)"
+                                            ></v-text-field>
                                         </v-col>
                                     </v-row>
-                                </template>
-                                <v-card :width="50">
-                                    <div :key="index" v-for="(icon, index) in getFilteredIconMap(column.iconMap)" @click="selectIcon(column, icon)">
-                                        <v-hover>
-                                            <template #default="{ hover }">
-                                                <div class="pa-3" style="cursor: pointer;" :class="hover ? 'grey lighten-3' : ''">
-                                                    <v-icon :color="icon.color">{{ composeIcon(icon.icon) }}</v-icon>
-                                                </div>
-                                            </template>
-                                        </v-hover>
-                                    </div>
-                                </v-card>
-                            </v-menu>
-                        </div>
+                                </div>
+                                <div v-else-if="column.type === 'timestamp'">
+                                    <v-row dense class="flex-nowrap">
+                                        <v-col cols="4">
+                                            <v-autocomplete
+                                                    dense
+                                                    outlined
+                                                    label="Operator"
+                                                    hide-details
+                                                    :items="timestampOperators"
+                                                    :value="!!filters[column.rawValue] ? filters[column.rawValue].operator : null"
+                                                    @input="selectOperator(column.rawValue, $event)"
+                                            ></v-autocomplete>
+                                        </v-col>
+                                        <v-col cols="8">
+                                            <v-menu
+                                                    transition="scale-transition"
+                                                    offset-y
+                                                    min-width="auto"
+                                                    :close-on-content-click="false"
+                                                    v-model="pickers[column.rawValue]"
+                                            >
+                                                <template v-slot:activator="{ on, attrs }">
+                                                    <v-text-field
+                                                            label="Date"
+                                                            prepend-inner-icon="mdi-calendar"
+                                                            readonly
+                                                            hide-details
+                                                            dense
+                                                            outlined
+                                                            clearable
+                                                            :disabled="!filters[column.rawValue] || !filters[column.rawValue].operator"
+                                                            :value="getFormattedTimestampValue(column.rawValue)"
+                                                            v-bind="attrs"
+                                                            v-on="on"
+                                                            @click:clear="clearOperator(column.rawValue)"
+                                                    ></v-text-field>
+                                                </template>
+                                                <v-date-picker
+                                                        color="primary"
+                                                        :value="!!filters[column.rawValue] ? filters[column.rawValue].value : null"
+                                                        @input="selectTimestamp(column.rawValue, $event)"
+                                                ></v-date-picker>
+                                            </v-menu>
+                                        </v-col>
+                                    </v-row>
+                                </div>
+                                <div v-else-if="column.type === 'icon' || (!!column.iconConditionRawValue)">
+                                    <v-menu bottom :max-width="50" :nudge-right="46">
+                                        <template #activator="{ on }">
+                                            <v-row no-gutters align="center" class="flex-nowrap">
+                                                <v-col cols="auto">
+                                                    <div class="rounded"
+                                                         style="border: 1px solid rgba(0,0,0,0.4); width: 40px; height: 40px; cursor: pointer; padding: 6px;"
+                                                         v-ripple v-on="on"
+                                                    >
+                                                        <v-icon :color="getSelectedIcon(column).color" v-if="!!getSelectedIcon(column)">
+                                                            {{ composeIcon(getSelectedIcon(column).icon) }}
+                                                        </v-icon>
+                                                    </div>
+                                                </v-col>
+                                                <v-col cols="auto" class="pl-1">
+                                                    <v-scroll-x-transition hide-on-leave>
+                                                        <v-btn small icon v-if="!!getSelectedIcon(column)" @click="clearIcon(column)">
+                                                            <v-icon>mdi-close</v-icon>
+                                                        </v-btn>
+                                                    </v-scroll-x-transition>
+                                                </v-col>
+                                            </v-row>
+                                        </template>
+                                        <v-card :width="50">
+                                            <div :key="index" v-for="(icon, index) in getFilteredIconMap(column.iconMap)" @click="selectIcon(column, icon)">
+                                                <v-hover>
+                                                    <template #default="{ hover }">
+                                                        <div class="pa-3" style="cursor: pointer;" :class="hover ? 'grey lighten-3' : ''">
+                                                            <v-icon :color="icon.color">{{ composeIcon(icon.icon) }}</v-icon>
+                                                        </div>
+                                                    </template>
+                                                </v-hover>
+                                            </div>
+                                        </v-card>
+                                    </v-menu>
+                                </div>
+                            </v-col>
+                        </v-row>
                     </td>
                 </tr>
             </table>
@@ -255,7 +259,7 @@
             },
             getSelectedIcon(column) {
                 let icons = column.iconMap,
-                    filter = this.filters[`${column.rawValue}_icon`];
+                        filter = this.filters[`${column.rawValue}_icon`];
 
                 if (!filter && !!column.iconConditionRawValue) {
                     filter = this.filters[`${column.iconConditionRawValue}_icon`];
