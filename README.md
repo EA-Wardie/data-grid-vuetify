@@ -19,7 +19,6 @@ composer require eawardie/data-grid-laravel
 ```
 
 ## Usage
-
 In you `main.js` or `app.js` register this package as a Vue plugin.
 
 ```javascript
@@ -40,21 +39,17 @@ The data property here receives its data from the data-grid-laravel package on t
 ### Properties
 
 #### Selectable
-
 The `selectable` property allows for row selection by checkboxes on the data grid itself.
 Using this property also **requires** the use of the `item-value` property.
 
 #### item-value
-
 The `item-value` property is used to indicate a unique item identifier.
 The property is only intended for use with the `seectable` property.
 
 #### return-object
-
 The `return-object` property return the entire item object on select instead on the associated item value from the `item-value` property.
 
 #### actions
-
 The `actions` property is used to pass actions to the actions to each data grid item row.
 Actions consist of an `array` of objects that build actions with a series of properties.
 these are covered below:
@@ -88,15 +83,22 @@ confirmation: {
 ```
 
 #### additional-actions
-
 The `aditional-actions` property is used to pass additional actions to the actions drawer for the data-grid.
 These actions operate the same as the `actions` property.
 
 #### hide-additional-actions
-
 The `hide-additional-actions` hides the action's drawer if it is not being used.
 
 #### value / v-model
-
 The `value` property is used to get the current selected items on the data-grid.
 For auto synced values use `v-model` instead.
+
+#### `v-drawer`
+The `v-drawer` directive can be used to mutate the addition actions drawer state from outside.
+Simple pass a data property to this directive and change it as needed.
+
+### Events
+
+#### `@click:row`
+The `@click:row` event can be used to enable clicking on data grid rows.
+The event payload will be the row item itself.

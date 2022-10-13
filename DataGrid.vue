@@ -18,23 +18,23 @@
                             >
                                 <template #activator="{ on }">
                                     <v-badge
-                                            bordered
-                                            color="grey"
-                                            overlap
-                                            :content="totalCurrentSearches + totalCurrentFilters"
-                                            :value="(!Array.isArray(afterPostQueries) && totalCurrentSearches > 0) || totalCurrentFilters > 0"
+                                        bordered
+                                        color="grey"
+                                        overlap
+                                        :content="totalCurrentSearches + totalCurrentFilters"
+                                        :value="(!Array.isArray(afterPostQueries) && totalCurrentSearches > 0) || totalCurrentFilters > 0"
                                     >
                                         <div v-on="on">
                                             <v-text-field
-                                                    outlined
-                                                    hide-details
-                                                    clearable
-                                                    prepend-inner-icon="mdi-magnify"
-                                                    placeholder="Search"
-                                                    style="width: 600px;"
-                                                    v-model="data.metaData.search.term"
-                                                    @click:clear="clearSearch()"
-                                                    @input="debouncedInitialSearch()"
+                                                outlined
+                                                hide-details
+                                                clearable
+                                                prepend-inner-icon="mdi-magnify"
+                                                placeholder="Search"
+                                                style="width: 600px;"
+                                                v-model="data.metaData.search.term"
+                                                @click:clear="clearSearch()"
+                                                @input="debouncedInitialSearch()"
                                             >
                                                 <template #append v-if="advancedColumns.length > 0">
                                                     <v-menu bottom
@@ -57,12 +57,12 @@
                                                         </template>
                                                         <v-card :width="500">
                                                             <filter-menu
-                                                                    :data="meta.filters"
-                                                                    :columns="meta.columns"
-                                                                    :has-layout="hasLayout"
-                                                                    v-if="menus.filter"
-                                                                    @filters="applyFilters($event)"
-                                                                    @clear="clearFilters()"
+                                                                :data="meta.filters"
+                                                                :columns="meta.columns"
+                                                                :has-layout="hasLayout"
+                                                                v-if="menus.filter"
+                                                                @filters="applyFilters($event)"
+                                                                @clear="clearFilters()"
                                                             ></filter-menu>
                                                         </v-card>
                                                     </v-menu>
@@ -82,11 +82,11 @@
                                 </template>
                                 <v-card :width="500">
                                     <search-menu
-                                            :value="menus.search"
-                                            :data="meta.search"
-                                            :columns="meta.columns"
-                                            v-if="menus.search"
-                                            @search="applySearch($event)"
+                                        :value="menus.search"
+                                        :data="meta.search"
+                                        :columns="meta.columns"
+                                        v-if="menus.search"
+                                        @search="applySearch($event)"
                                     ></search-menu>
                                 </v-card>
                             </v-menu>
@@ -95,15 +95,15 @@
                 </v-col>
                 <v-col cols="auto" class="flex-grow-1">
                     <header-filter-section
-                            :current-total-items="items.length"
-                            :meta-data="meta"
-                            v-if="page.innerWidth > 1299"
-                            @layout="applyLayout($event)"
-                            @pageDown="pageDown()"
-                            @pageUp="pageUp()"
-                            @sort="applySortBy($event)"
-                            @view="applyView($event)"
-                            @goToPage="goToPage($event)"
+                        :current-total-items="items.length"
+                        :meta-data="meta"
+                        v-if="page.innerWidth > 1299"
+                        @layout="applyLayout($event)"
+                        @pageDown="pageDown()"
+                        @pageUp="pageUp()"
+                        @sort="applySortBy($event)"
+                        @view="applyView($event)"
+                        @goToPage="goToPage($event)"
                     ></header-filter-section>
                     <v-row no-gutters justify="end" align="center" class="fill-height" v-else>
                         <v-col cols="auto">
@@ -115,14 +115,14 @@
                                 </template>
                                 <v-card class="px-2">
                                     <header-filter-section
-                                            :current-total-items="data.items.length"
-                                            :meta-data="meta"
-                                            @layout="applyLayout($event)"
-                                            @pageDown="pageDown()"
-                                            @pageUp="pageUp()"
-                                            @sort="applySortBy($event)"
-                                            @view="applyView($event)"
-                                            @goToPage="goToPage($event)"
+                                        :current-total-items="data.items.length"
+                                        :meta-data="meta"
+                                        @layout="applyLayout($event)"
+                                        @pageDown="pageDown()"
+                                        @pageUp="pageUp()"
+                                        @sort="applySortBy($event)"
+                                        @view="applyView($event)"
+                                        @goToPage="goToPage($event)"
                                     ></header-filter-section>
                                 </v-card>
                             </v-menu>
@@ -172,14 +172,14 @@
                                 <tr>
                                     <th class="px-2" style="width: 1%;" v-if="selectable">
                                         <v-simple-checkbox
-                                                style="transform: translateX(4px);"
-                                                class="ma-0 pa-0"
-                                                color="secondary"
-                                                :disabled="items.length === 0"
-                                                :value="selectedItems.length === items.length && items.length !== 0"
-                                                :indeterminate="selectedItems.length > 0 && selectedItems.length < items.length"
-                                                v-ripple="false"
-                                                @input="selectAllItems()"
+                                            style="transform: translateX(4px);"
+                                            class="ma-0 pa-0"
+                                            color="secondary"
+                                            :disabled="items.length === 0"
+                                            :value="selectedItems.length === items.length && items.length !== 0"
+                                            :indeterminate="selectedItems.length > 0 && selectedItems.length < items.length"
+                                            v-ripple="false"
+                                            @input="selectAllItems()"
                                         ></v-simple-checkbox>
                                     </th>
                                     <th :key="index"
@@ -206,19 +206,24 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr :key="rowIndex" v-for="(item, rowIndex) in items">
+                                <tr class="clicked"
+                                    :style="{ cursor: $listeners && $listeners['click:row'] ? 'pointer' : 'default' }"
+                                    :key="rowIndex"
+                                    v-for="(item, rowIndex) in items"
+                                    @click="emitRowClicked(item)"
+                                >
                                     <td class="px-2"
                                         style="width: 1%;"
                                         :style="{ borderBottom: segmented && rowIndex === items.length - 1 ? '1px solid rgba(0,0,0,0.12)' : '' }"
                                         v-if="selectable"
                                     >
                                         <v-simple-checkbox
-                                                style="transform: translateX(4px);"
-                                                class="ma-0 pa-0"
-                                                color="primary"
-                                                :value="item.selected"
-                                                v-ripple="false"
-                                                @input="setSelectedItem(item)"
+                                            style="transform: translateX(4px);"
+                                            class="ma-0 pa-0"
+                                            color="primary"
+                                            :value="item.selected"
+                                            v-ripple="false"
+                                            @input="setSelectedItem(item)"
                                         ></v-simple-checkbox>
                                     </td>
                                     <td :key="colIndex"
@@ -229,16 +234,16 @@
                                         v-for="(column, colIndex) in orderedColumns"
                                         v-show="!column.hidden"
                                     >
-                                        <slot :name="column.value"
+                                        <slot :name="column.isRaw ? column.value : column.rawValue"
                                               :column="column"
                                               :column-index="colIndex"
                                               :item="item"
                                               :item-index="rowIndex"
                                         >
                                             <row-column-value
-                                                    :item="item"
-                                                    :column="column"
-                                                    :hyperlinks="!!meta.hyperlinks"
+                                                :item="item"
+                                                :column="column"
+                                                :hyperlinks="!!meta.hyperlinks"
                                             ></row-column-value>
                                         </slot>
                                     </td>
@@ -254,18 +259,18 @@
                                             <v-menu bottom :nudge-bottom="32" :min-width="120">
                                                 <template #activator="{ on, value }">
                                                     <v-btn icon small color="primary" v-on="on">
-                                                        <v-icon small>{{ value ? 'mdi-dots-horizontal' : 'mdi-dots-vertical' }}</v-icon>
+                                                        <v-icon small>{{ value ? 'mdi-dots-vertical-circle-outline' : 'mdi-dots-vertical' }}</v-icon>
                                                     </v-btn>
                                                 </template>
                                                 <v-card width="100%">
                                                     <div :key="index" v-for="(action, index) in actions">
                                                         <v-list-item
-                                                                dense
-                                                                :class="!!action.color ? `${action.color}--text` : 'black--text'"
-                                                                :color="action.color || 'primary'"
-                                                                :disabled="action.disabled || false"
-                                                                v-if="!!action.show ? action.show(item) : true"
-                                                                @click="action.confirmation ? confirmClosure(action, item) : action.closure(item)"
+                                                            dense
+                                                            :class="!!action.color ? `${action.color}--text` : 'black--text'"
+                                                            :color="action.color || 'primary'"
+                                                            :disabled="action.disabled || false"
+                                                            v-if="!!action.show ? action.show(item) : true"
+                                                            @click="action.confirmation ? confirmClosure(action, item) : action.closure(item)"
                                                         >
                                                             <v-list-item-content>
                                                                 <v-list-item-title>{{ action.label }}</v-list-item-title>
@@ -333,10 +338,10 @@
                 </v-col>
                 <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? '266px' : '0px' }">
                     <action-drawer
-                            :value="additionalActionDrawer"
-                            :height="page.innerHeight - 230"
-                            :actions="additionalActions"
-                            :selected-items="returnObject ? Object.values(selectedMap) : Object.keys(selectedMap)"
+                        :value="additionalActionDrawer"
+                        :height="page.innerHeight - 230"
+                        :actions="additionalActions"
+                        :selected-items="returnObject ? Object.values(selectedMap) : Object.keys(selectedMap)"
                     >
                         <template #title>
                             <slot name="actionDrawerTitle"></slot>
@@ -761,7 +766,7 @@
             },
             post(clear = false) {
                 const data = this.getPostDataBasedOnStates(),
-                        btoa = Buffer.from(JSON.stringify(data), 'utf8').toString('base64');
+                    btoa = Buffer.from(JSON.stringify(data), 'utf8').toString('base64');
 
                 let payload = {};
                 if (!clear) {
@@ -782,16 +787,16 @@
             },
             postChanges(action, data = {}, clear = false, preserve = true) {
                 this.$inertia.post(
-                        this.$route(`datagrid.${action}`, [this.meta.tableRef]),
-                        data,
-                        {
-                            preserveScroll: true,
-                            preserveState: preserve,
-                            onSuccess: () => {
-                                this.setActiveItems();
-                                this.afterPromise(clear);
-                            },
-                        }
+                    this.$route(`datagrid.${action}`, [this.meta.tableRef]),
+                    data,
+                    {
+                        preserveScroll: true,
+                        preserveState: preserve,
+                        onSuccess: () => {
+                            this.setActiveItems();
+                            this.afterPromise(clear);
+                        },
+                    }
                 );
             },
             openSearchMenu() {
@@ -829,6 +834,9 @@
                     };
                 }, 250);
             },
+            emitRowClicked(item) {
+                this.$emit('click:row', item);
+            },
         },
         mounted() {
             this.setPageSizes();
@@ -855,5 +863,13 @@
     .hide-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
+    }
+
+    .clicked {
+        transition: background-color 0.05s;
+    }
+
+    .clicked:active {
+        background-color: rgba(0, 0, 0, 0.05) !important;
     }
 </style>
