@@ -2,7 +2,7 @@
     <div>
         <div class="pa-4">
             <v-alert dense text outlined color="grey" type="info" v-if="hasLayout">
-                Some filters are hidden due to an active layout.
+                Some filters are hidden due to an active view.
             </v-alert>
             <div class="mb-2 font-weight-bold black--text">Filters</div>
             <table style="width: 100%;">

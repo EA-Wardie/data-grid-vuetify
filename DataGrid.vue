@@ -99,6 +99,8 @@
                         :meta-data="meta"
                         v-if="page.innerWidth > 1299"
                         @layout="applyLayout($event)"
+                        @addLayout="addLayout($event)"
+                        @removeLayout="removeLayout($event)"
                         @pageDown="pageDown()"
                         @pageUp="pageUp()"
                         @sort="applySortBy($event)"
@@ -118,6 +120,8 @@
                                         :current-total-items="data.items.length"
                                         :meta-data="meta"
                                         @layout="applyLayout($event)"
+                                        @addLayout="addLayout($event)"
+                                        @removeLayout="removeLayout($event)"
                                         @pageDown="pageDown()"
                                         @pageUp="pageUp()"
                                         @sort="applySortBy($event)"
@@ -164,7 +168,7 @@
                 </v-col>
             </v-row>
             <v-row no-gutters class="flex-nowrap">
-                <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? 'calc(100% - 266px)' : '100%' }">
+                <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? `calc(100% - ${actionDrawerWidth}px)` : '100%' }">
                     <v-card class="overflow-hidden rounded" style="position: relative;" :loading="loading" :disabled="loading">
                         <v-simple-table fixed-header :height="page.innerHeight - 230">
                             <template #default>
@@ -207,10 +211,13 @@
                                 </thead>
                                 <tbody>
                                 <tr class="clicked"
-                                    :style="{ cursor: $listeners && $listeners['click:row'] ? 'pointer' : 'default' }"
+                                    :style="{
+                                        cursor: $listeners && $listeners['click:row'] ? 'pointer' : 'default',
+                                        backgroundColor: clickedRowIndex === rowIndex ? 'rgba(0, 0, 0, 0.07)' : '',
+                                    }"
                                     :key="rowIndex"
                                     v-for="(item, rowIndex) in items"
-                                    @click="emitRowClicked(item)"
+                                    @click="emitRowClicked(item, rowIndex)"
                                 >
                                     <td class="px-2"
                                         style="width: 1%;"
@@ -281,12 +288,12 @@
                                                 </v-card>
                                             </v-menu>
                                         </div>
-                                        <div v-else>
+                                        <div v-else-if="actions.length === 1">
                                             <v-btn text
                                                    small
                                                    :color="actions[0].color || 'primary'"
                                                    :disabled="actions[0].disabled || false"
-                                                   v-if="!!actions[0].show ? actions[0].show(item) : true"
+                                                   v-if="!!actions[0] && actions[0].show ? actions[0].show(item) : true"
                                                    @click="actions[0].confirmation ? confirmClosure(actions[0], item) : actions[0].closure(item)"
                                             >{{ actions[0].label }}
                                             </v-btn>
@@ -336,18 +343,16 @@
                         </div>
                     </v-card>
                 </v-col>
-                <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? '266px' : '0px' }">
+                <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? `${actionDrawerWidth}px` : '0px' }">
                     <action-drawer
+                        :width="actionDrawerWidth"
                         :value="additionalActionDrawer"
                         :height="page.innerHeight - 230"
                         :actions="additionalActions"
                         :selected-items="returnObject ? Object.values(selectedMap) : Object.keys(selectedMap)"
                     >
-                        <template #title>
-                            <slot name="actionDrawerTitle"></slot>
-                        </template>
                         <template #default>
-                            <slot name="actionDrawerBody"></slot>
+                            <slot name="drawer"></slot>
                         </template>
                     </action-drawer>
                 </v-col>
@@ -431,6 +436,10 @@
             hideAdditionalActions: {
                 type: Boolean,
                 default: false,
+            },
+            actionDrawerWidth: {
+                type: Number | String,
+                default: 266,
             },
             segmented: {
                 type: Boolean,
@@ -554,6 +563,7 @@
                 },
                 afterPostQueries: {},
                 selectedMap: {},
+                clickedRowIndex: null,
             };
         },
         methods: {
@@ -676,7 +686,15 @@
             },
             applyLayout(layout) {
                 this.loading = true;
-                this.postChanges('layout', {layout: layout}, false, false);
+                this.postChanges('layout', {layout: layout, sort: this.meta.sortBy}, false, false);
+            },
+            addLayout(layout) {
+                this.loading = true;
+                this.postChanges('add', {layout: layout, sort: this.meta.sortBy}, false, false);
+            },
+            removeLayout(layout) {
+                this.loading = true;
+                this.postChanges('remove', {layout: layout}, false, false);
             },
             pageUp() {
                 this.updateMeta('page', ++this.meta.page);
@@ -834,8 +852,9 @@
                     };
                 }, 250);
             },
-            emitRowClicked(item) {
+            emitRowClicked(item, index) {
                 this.$emit('click:row', item);
+                this.clickedRowIndex = index;
             },
         },
         mounted() {

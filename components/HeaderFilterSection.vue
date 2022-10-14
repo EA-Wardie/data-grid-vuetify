@@ -6,11 +6,13 @@
                     icon="mdi-table-edit"
                     :icon-color="!hasLayout ? 'grey' : 'secondary'"
                     v-model="layoutMenu"
-                >Views
+                >{{ hasLayout ? currentLayout.label : 'Views' }}
                     <template #menu>
                         <view-menu-content
                             :layouts="metaData.layouts"
                             @layout="emitLayout($event)"
+                            @add="emitLayoutAdd($event)"
+                            @remove="emitLayoutRemove($event)"
                         ></view-menu-content>
                     </template>
                 </header-filter-action>
@@ -120,8 +122,11 @@
             },
         },
         computed: {
+            currentLayout() {
+                return this.metaData.layouts.find(({current}) => current);
+            },
             hasLayout() {
-                return this.metaData.layouts.findIndex(({current}) => current) !== -1;
+                return !!this.currentLayout;
             },
             hasSortBy() {
                 return Object.keys(this.metaData.sortBy).length > 0;
@@ -157,6 +162,21 @@
         methods: {
             emitLayout(layout) {
                 this.$emit('layout', layout);
+            },
+            emitLayoutAdd(layout) {
+                layout['columns'] = this.metaData.columns.map((column) => {
+                    const value = column.isRaw ? column.value : column.rawValue;
+                    return {
+                        value: value,
+                        order: column.index,
+                        hidden: column.hidden,
+                    };
+                });
+
+                this.$emit('addLayout', layout);
+            },
+            emitLayoutRemove(layout) {
+                this.$emit('removeLayout', layout);
             },
             emitPageDown() {
                 this.$emit('pageDown');

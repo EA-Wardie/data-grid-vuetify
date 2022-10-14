@@ -7,3 +7,7 @@ export const debounce = (func, delay) => {
         inDebounce = setTimeout(() => func.apply(context, args), delay);
     }
 };
+
+export function getRecommendations(columns) {
+    console.log(columns);
+}

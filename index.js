@@ -6,7 +6,11 @@ export default {
         Vue.directive('drawer', {
             update: (el, binding, vnode) => {
                 if (binding.value !== binding.oldValue) {
-                    vnode.context.$children[0]['additionalActionDrawer'] = binding.value;
+                    const child = vnode.context.$children.find((child) => child.hasOwnProperty('additionalActionDrawer'));
+
+                    if (child) {
+                        child.additionalActionDrawer = binding.value;
+                    }
                 }
             },
         });

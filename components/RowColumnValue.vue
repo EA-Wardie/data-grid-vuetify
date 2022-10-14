@@ -148,7 +148,7 @@
                 return this.column.timestampFormat ? this.column.timestampFormat : 'D MMM YYYY';
             },
             shouldCenter() {
-                return this.column.type === 'number' || this.column.type === 'enum';
+                return this.column.type === 'number';
             },
         },
         methods: {
