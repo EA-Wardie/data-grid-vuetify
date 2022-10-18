@@ -38,7 +38,7 @@ The data property here receives its data from the data-grid-laravel package on t
 
 ### Properties
 
-#### Selectable
+#### selectable
 The `selectable` property allows for row selection by checkboxes on the data grid itself.
 Using this property also **requires** the use of the `item-value` property.
 
@@ -47,7 +47,7 @@ The `item-value` property is used to indicate a unique item identifier.
 The property is only intended for use with the `seectable` property.
 
 #### return-object
-The `return-object` property return the entire item object on select instead on the associated item value from the `item-value` property.
+The `return-object` property returns the entire item object on select instead on the associated item value from the `item-value` property.
 
 #### actions
 The `actions` property is used to pass actions to the actions to each data grid item row.
@@ -56,14 +56,15 @@ these are covered below:
 
 - `color` - Sets the color of the action
 - `label` - Sets the action label
+- `icon` - Sets the icon - takes a string or callback for dynamic icons - `bind(this)`
 - `confimation` - Apply a confirmation dialog on action event using this string - `more info below`
 - `disabled` - Sets whether the action should be disabled
 - `show` - Evaluates if the action should be displayed, receives a callback - `bind(this)`
 - `closure` - Callback function called by the action event itself - `bind(this)`
 
 The confirmation property can be used in a more advanced way to edit the look and feel of the confirmation dialog.
-Either pass a string for the confirmation message, or a set of option via object notation.
-The example below shoes all available options in advanced mode.
+Either pass a string for the confirmation message, or a set of options via object notation.
+The example below shows all available options.
 
 ```javascript
 confirmation: {
@@ -94,8 +95,8 @@ The `value` property is used to get the current selected items on the data-grid.
 For auto synced values use `v-model` instead.
 
 #### `v-drawer`
-The `v-drawer` directive can be used to mutate the addition actions drawer state from outside.
-Simple pass a data property to this directive and change it as needed.
+The `v-drawer` directive can be used to mutate the additional actions drawer state from outside.
+Simply pass a data property to this directive and change it as needed.
 
 ### Events
 

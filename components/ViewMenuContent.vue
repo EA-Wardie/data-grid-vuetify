@@ -150,7 +150,14 @@
 
                 this.selected = selected;
             },
-            emitValue() {
+            emitValue(id) {
+                if (id === null) {
+                    this.$emit('layout', null);
+                } else if (!this.selected) {
+                    const found = this.innerLayouts.find(({current}) => current);
+                    this.selected = found ? found.id : null;
+                }
+
                 this.$emit('layout', this.selected);
             },
             initAddView() {

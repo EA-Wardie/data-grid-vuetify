@@ -36,7 +36,7 @@
                                                 @click:clear="clearSearch()"
                                                 @input="debouncedInitialSearch()"
                                             >
-                                                <template #append v-if="advancedColumns.length > 0">
+                                                <template #append v-if="advancedColumns.length > 0 || hasFilters">
                                                     <v-menu bottom
                                                             left
                                                             :max-width="500"
@@ -279,6 +279,12 @@
                                                             v-if="!!action.show ? action.show(item) : true"
                                                             @click="action.confirmation ? confirmClosure(action, item) : action.closure(item)"
                                                         >
+                                                            <v-list-item-icon class="ml-0 mr-1" v-if="!!action.icon">
+                                                                <v-icon small
+                                                                        :color="action.color || ''"
+                                                                >{{ handleActionIcon(action.icon, item) }}
+                                                                </v-icon>
+                                                            </v-list-item-icon>
                                                             <v-list-item-content>
                                                                 <v-list-item-title>{{ action.label }}</v-list-item-title>
                                                             </v-list-item-content>
@@ -388,7 +394,7 @@
 </template>
 
 <script>
-    import {debounce} from "./helpers/helpers";
+    import {debounce, getRecommendations} from "./helpers/helpers";
     import HeaderFilterSection from "./components/HeaderFilterSection";
     import RowColumnValue from "./components/RowColumnValue";
     import SearchMenu from "./components/SearchMenu";
@@ -478,7 +484,7 @@
                 return this.currentSearches.length;
             },
             totalCurrentFilters() {
-                return Object.keys(this.meta.filters).length;
+                return Object.values(this.meta.filters).filter((filter) => !Array.isArray(filter)).length;
             },
             confirmAction() {
                 if (!!this.actionClosure && !!this.actionClosure.action && !!this.actionClosure.action.confirmation) {
@@ -614,35 +620,32 @@
                 return query.reduce((carry, term, index) => index === 0 ? carry + term : carry + `, ${term}`, '');
             },
             getColumnLabel(query) {
+                let isSubtitle = false;
                 const column = this.meta.columns.find((column) => {
-                    const value = column['isRaw'] ? column['value'] : column['rawValue'];
+                    const value = column['isRaw'] ? column['value'] : column['rawValue'],
+                        subtitle = column['subtitleIsRaw'] ? column['subtitle'] : column['rawSubtitle'];
 
-                    return value === query;
+                    if (subtitle === query) {
+                        isSubtitle = true;
+                    }
+
+                    return value === query || subtitle === query;
                 });
 
                 if (column) {
-                    return column.label;
-                } else {
-                    const column = this.meta.columns.find((column) => {
-                        return query.split('.')[1] === column['subtitle'];
-                    });
-
-                    if (column) {
-                        return `${column.label} subtitle`;
-                    }
+                    return !isSubtitle ? column.label : column.subtitleLabel;
                 }
 
                 return '';
             },
+            handleSearchRecommendations() {
+                this.updateMetaSubValue('search', 'recommendations', []);
+                this.updateMetaSubValue('search', 'recommendations', getRecommendations(this.meta.columns, this.meta.search.term));
+            },
             applyInitialSearch() {
-                this.updateMetaSubValue('search', 'initial', true);
                 this.searchQueriesFromArrayToObject();
-
-                if (this.meta.states.search === 'route') {
-                    this.post();
-                } else {
-                    this.postChanges('search', {search: this.meta.search});
-                }
+                this.updateMetaSubValue('search', 'initial', true);
+                this.handleSearchRecommendations();
             },
             clearSearch() {
                 this.updateMetaSubValue('search', 'initial', true);
@@ -686,11 +689,17 @@
             },
             applyLayout(layout) {
                 this.loading = true;
-                this.postChanges('layout', {layout: layout, sort: this.meta.sortBy}, false, false);
+                this.postChanges('layout', {layout: layout}, false, false);
             },
             addLayout(layout) {
                 this.loading = true;
-                this.postChanges('add', {layout: layout, sort: this.meta.sortBy}, false, false);
+                const data = {
+                    layout: layout,
+                    search: this.meta.search,
+                    sort: this.meta.sortBy,
+                    filters: this.meta.filters,
+                };
+                this.postChanges('add', data, false, false);
             },
             removeLayout(layout) {
                 this.loading = true;
@@ -766,8 +775,6 @@
 
                 if (this.meta.states.search === 'route') {
                     this.$set(data, 'search', {
-                        initial: this.meta.search.initial,
-                        term: this.meta.search.term,
                         queries: this.meta.search.queries,
                     });
                 }
@@ -795,7 +802,6 @@
 
                 this.$inertia.reload({
                     data: payload,
-                    // preserveState: false,
                     preserveScroll: true,
                     onSuccess: () => {
                         this.setActiveItems();
@@ -855,6 +861,13 @@
             emitRowClicked(item, index) {
                 this.$emit('click:row', item);
                 this.clickedRowIndex = index;
+            },
+            handleActionIcon(icon, item) {
+                if (typeof icon === 'string') {
+                    return icon;
+                } else if (typeof icon === 'function') {
+                    return icon(item);
+                }
             },
         },
         mounted() {

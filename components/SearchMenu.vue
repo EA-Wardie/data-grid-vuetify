@@ -4,16 +4,14 @@
             <div class="font-weight-bold black--text" :class="data.recommendations.length > 0 ? 'mb-2' : ''">
                 Search Recommendations
             </div>
-            <v-expand-transition>
-                <div class="subtitle-2 grey--text" v-if="data.recommendations.length === 0">
+            <v-expand-transition mode="out-in">
+                <div key="text" class="subtitle-2 grey--text" v-if="data.recommendations.length === 0">
                     Start typing to get search recommendations.
                 </div>
-            </v-expand-transition>
-            <v-expand-transition>
-                <v-row dense>
+                <v-row key="recs" dense v-else>
                     <v-col cols="auto" :key="index" v-for="(recommendation, index) in data.recommendations">
                         <v-card flat
-                                class="px-2 py-1"
+                                class="px-2 py-1 subtitle-2"
                                 style="border: 1px solid lightgray !important;"
                                 :color="isSelected(recommendation) ? 'primary lighten-3' : 'white'"
                                 :dark="isSelected(recommendation)"

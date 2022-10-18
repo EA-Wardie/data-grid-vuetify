@@ -3,6 +3,7 @@ import DataGrid from './DataGrid';
 export default {
     install(Vue) {
         Vue.component('data-grid', DataGrid);
+        Vue.component('DataGrid', DataGrid);
         Vue.directive('drawer', {
             update: (el, binding, vnode) => {
                 if (binding.value !== binding.oldValue) {
