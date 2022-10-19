@@ -195,9 +195,9 @@
                                             <v-col cols="auto">
                                                 <div style="white-space: nowrap;">{{ column.label }}</div>
                                             </v-col>
-                                            <v-col cols="auto" class="pl-1" v-if="!!meta.sortBy && meta.sortBy[column.value]">
+                                            <v-col cols="auto" class="pl-1" v-if="!!meta.sortBy && meta.sortBy[column.rawValue]">
                                                 <v-btn x-small icon @click="changeSortDirection(column)">
-                                                    <v-icon x-small>{{ meta.sortBy[column.value] === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}</v-icon>
+                                                    <v-icon x-small>{{ meta.sortBy[column.rawValue] === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}</v-icon>
                                                 </v-btn>
                                             </v-col>
                                         </v-row>
@@ -735,8 +735,8 @@
                 }
             },
             changeSortDirection(column) {
-                const order = this.meta.sortBy[column.value] === 'asc' ? 'desc' : 'asc';
-                this.updateMetaSubValue('sortBy', column.value, order);
+                const order = this.meta.sortBy[column.rawValue] === 'asc' ? 'desc' : 'asc';
+                this.updateMetaSubValue('sortBy', column.rawValue, order);
 
                 if (this.meta.states.sort === 'route') {
                     this.post();

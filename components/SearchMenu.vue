@@ -1,11 +1,11 @@
 <template>
     <div style="user-select: none;">
         <div class="pa-4">
-            <div class="font-weight-bold black--text" :class="data.recommendations.length > 0 ? 'mb-2' : ''">
+            <div class="font-weight-bold black--text" :class="!!data.recommendations && data.recommendations.length > 0 ? 'mb-2' : ''">
                 Search Recommendations
             </div>
             <v-expand-transition mode="out-in">
-                <div key="text" class="subtitle-2 grey--text" v-if="data.recommendations.length === 0">
+                <div key="text" class="subtitle-2 grey--text" v-if="!data.recommendations || data.recommendations.length === 0">
                     Start typing to get search recommendations.
                 </div>
                 <v-row key="recs" dense v-else>

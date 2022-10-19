@@ -25,9 +25,9 @@
                         <v-btn icon
                                outlined
                                x-small
-                               :class="sortOptionSelected(column.value) ? 'primary' : ''"
-                               :dark="sortOptionSelected(column.value)"
-                               @click="setSortOptions(column)"
+                               :class="sortOptionSelected(column.rawValue) ? 'primary' : ''"
+                               :dark="sortOptionSelected(column.rawValue)"
+                               @click="setSortOptions(column.rawValue)"
                         >
                             <v-icon>mdi-arrow-up</v-icon>
                         </v-btn>
@@ -36,9 +36,9 @@
                         <v-btn icon
                                outlined
                                x-small
-                               :class="sortOptionSelected(column.value, 'desc') ? 'primary' : ''"
-                               :dark="sortOptionSelected(column.value, 'desc')"
-                               @click="setSortOptions(column, 'desc')"
+                               :class="sortOptionSelected(column.rawValue, 'desc') ? 'primary' : ''"
+                               :dark="sortOptionSelected(column.rawValue, 'desc')"
+                               @click="setSortOptions(column.rawValue, 'desc')"
                         >
                             <v-icon>mdi-arrow-down</v-icon>
                         </v-btn>
@@ -95,10 +95,9 @@
                 }
             },
             sortIndex(column) {
-                return Object.keys(this.innerSortBy).findIndex((key) => key === column.value);
+                return Object.keys(this.innerSortBy).findIndex((key) => key === column.rawValue);
             },
-            setSortOptions(column, direction = 'asc') {
-                const value = column.isRaw ? column.value : column.rawValue;
+            setSortOptions(value, direction = 'asc') {
                 if (this.innerSortBy[value]) {
                     if (direction === this.innerSortBy[value]) {
                         this.$delete(this.innerSortBy, value);
