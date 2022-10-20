@@ -324,8 +324,8 @@
                                             </v-col>
                                         </v-row>
                                     </div>
-                                    <div class="text-center" v-if="hasFilters || hasSearch">
-                                        <slot name="noItemsWithFilters">
+                                    <div class="text-center grey--text" v-if="hasFilters || hasSearch">
+                                        <slot name="no-data-with-filters">
                                             <div>Filters you have applied did not return any results.</div>
                                             <div>Please change or remove the filters completely.</div>
                                             <v-btn block
@@ -338,8 +338,8 @@
                                             </v-btn>
                                         </slot>
                                     </div>
-                                    <div class="text-center" v-else>
-                                        <slot name="noItems">
+                                    <div class="text-center grey--text" v-else>
+                                        <slot name="no-data">
                                             <div>This page does not have any data yet.</div>
                                             <div>Please check back soon!</div>
                                         </slot>
@@ -655,7 +655,7 @@
                 if (this.meta.states.search === 'route') {
                     this.post();
                 } else {
-                    this.postChanges('search', {search: this.meta.search}, true);
+                    this.postChanges('search', {search: this.meta.search});
                 }
             },
             clearSearchQuery(query) {
@@ -664,7 +664,7 @@
                 if (this.meta.states.search === 'route') {
                     this.post();
                 } else {
-                    this.postChanges('search', {search: this.meta.search}, true);
+                    this.postChanges('search', {search: this.meta.search});
                 }
             },
             applySearch(queries) {
@@ -689,7 +689,7 @@
             },
             applyLayout(layout) {
                 this.loading = true;
-                this.postChanges('layout', {layout: layout}, false, false);
+                this.postChanges('layout', {layout: layout});
             },
             addLayout(layout) {
                 this.loading = true;
@@ -699,11 +699,11 @@
                     sort: this.meta.sortBy,
                     filters: this.meta.filters,
                 };
-                this.postChanges('add', data, false, false);
+                this.postChanges('add', data);
             },
             removeLayout(layout) {
                 this.loading = true;
-                this.postChanges('remove', {layout: layout}, false, false);
+                this.postChanges('remove', {layout: layout});
             },
             pageUp() {
                 this.updateMeta('page', ++this.meta.page);
@@ -747,26 +747,17 @@
             applyView(columns) {
                 this.loading = true;
                 this.updateMeta('columns', columns);
-                this.postChanges('view', {columns: columns}, false, false);
+                this.postChanges('view', {columns: columns});
             },
             applyClear() {
                 this.loading = true;
                 this.post(true);
             },
-            afterPromise(clear = false) {
+            afterPromise() {
                 this.searchQueriesFromArrayToObject();
                 this.closeFilterMenu();
-                this.afterPostQueries = JSON.parse(JSON.stringify(this.meta.search.queries));
-                if (this.meta.search && !!this.meta.search.term && this.meta.search.initial) {
-                    this.openSearchMenu();
-                } else {
-                    this.closeSearchMenu();
-                }
-
-                if (clear) {
-                    this.updateMeta('filters', {});
-                    this.postChanges('filters', {filters: {}});
-                }
+                this.closeSearchMenu();
+                this.setAfterPostQueries();
 
                 this.loading = false;
             },
@@ -797,7 +788,7 @@
                 if (!clear) {
                     payload = {q: btoa};
                 } else {
-                    payload = {q: {}};
+                    payload = {};
                 }
 
                 this.$inertia.reload({
@@ -805,26 +796,24 @@
                     preserveScroll: true,
                     onSuccess: () => {
                         this.setActiveItems();
-                        this.afterPromise(clear);
+                        this.afterPromise();
                     },
                 });
             },
-            postChanges(action, data = {}, clear = false, preserve = true) {
+            postChanges(action, data = {}) {
+                const ref = Buffer.from(this.meta.tableRef, 'utf8').toString('base64');
                 this.$inertia.post(
-                    this.$route(`datagrid.${action}`, [this.meta.tableRef]),
+                    this.$route(`datagrid.${action}`, [ref]),
                     data,
                     {
                         preserveScroll: true,
-                        preserveState: preserve,
+                        preserveState: false,
                         onSuccess: () => {
                             this.setActiveItems();
-                            this.afterPromise(clear);
+                            this.afterPromise();
                         },
                     }
                 );
-            },
-            openSearchMenu() {
-                this.menus.search = true;
             },
             closeSearchMenu() {
                 this.menus.search = false;
@@ -869,13 +858,18 @@
                     return icon(item);
                 }
             },
+            setAfterPostQueries() {
+                if (this.meta.search && this.meta.search.queries) {
+                    this.afterPostQueries = JSON.parse(JSON.stringify(this.meta.search.queries));
+                }
+            },
         },
         mounted() {
             this.setPageSizes();
+            this.setAfterPostQueries();
         },
         beforeMount() {
             this.registerEvents();
-            this.afterPostQueries = JSON.parse(JSON.stringify(this.meta.search.queries));
         },
         created() {
             this.debouncedPaginate = debounce(this.paginate, 250);

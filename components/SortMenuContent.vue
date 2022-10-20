@@ -86,6 +86,13 @@
                 innerSortBy: {},
             };
         },
+        watch: {
+            sortBy(val) {
+                if (Object.values(val).length !== Object.values(this.innerSortBy).length) {
+                    this.cloneInner();
+                }
+            },
+        },
         methods: {
             cloneInner() {
                 if (Object.keys(this.sortBy).length !== 0) {
