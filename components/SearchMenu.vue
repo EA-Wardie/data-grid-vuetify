@@ -65,7 +65,7 @@
         },
         methods: {
             initState() {
-                if (Array.isArray(this.data.queries)) {
+                if (Array.isArray(this.data.queries) || !this.data.queries) {
                     this.$set(this.data, 'queries', {});
                 }
             },
