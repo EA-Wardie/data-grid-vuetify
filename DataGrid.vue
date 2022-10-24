@@ -328,14 +328,14 @@
                                         <slot name="no-data-with-filters">
                                             <div>Filters you have applied did not return any results.</div>
                                             <div>Please change or remove the filters completely.</div>
-                                            <v-btn block
-                                                   class="mt-4"
-                                                   color="grey"
-                                                   :disabled="loading"
-                                                   :dark="!loading"
-                                                   @click="applyClear()"
-                                            >Clear Filters
-                                            </v-btn>
+<!--                                            <v-btn block-->
+<!--                                                   class="mt-4"-->
+<!--                                                   color="grey"-->
+<!--                                                   :disabled="loading"-->
+<!--                                                   :dark="!loading"-->
+<!--                                                   @click="applyClear()"-->
+<!--                                            >Clear Filters-->
+<!--                                            </v-btn>-->
                                         </slot>
                                     </div>
                                     <div class="text-center grey--text" v-else>
