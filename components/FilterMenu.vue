@@ -275,7 +275,14 @@
                     filter = this.filters[`${column.iconConditionRawValue}_icon`];
                 }
 
-                return icons.find(({value, operator}) => filter.value === value && filter.operator === operator);
+                return icons.find(({value, operator}) => {
+                    let op = operator;
+                    if (operator === '===') {
+                        op = '=';
+                    }
+
+                    return filter.value === value && filter.operator === op
+                });
             },
             composeIcon(icon) {
                 return icon.includes('mdi-') ? icon : `mdi-${icon}`;

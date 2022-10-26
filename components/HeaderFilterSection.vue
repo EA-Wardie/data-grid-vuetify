@@ -1,5 +1,5 @@
 <template>
-    <v-row no-gutters justify="end" align="center" class="fill-height">
+    <v-row no-gutters justify="end" align="center" class="fill-height flex-nowrap">
         <v-col cols="auto" v-if="metaData.layouts.length > 0">
             <div class="px-1">
                 <header-filter-action
@@ -92,6 +92,7 @@
                 </v-expand-x-transition>
             </div>
         </v-col>
+        <slot name="action"></slot>
     </v-row>
 </template>
 

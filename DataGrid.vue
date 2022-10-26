@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-card tile
-                class="pa-4"
+                class="py-4 px-6"
                 style="position: absolute; top: 0; left: 0; user-select: none;"
                 width="100%"
         >
@@ -97,7 +97,7 @@
                     <header-filter-section
                         :current-total-items="items.length"
                         :meta-data="meta"
-                        v-if="page.innerWidth > 1299"
+                        v-if="page.innerWidth > 1399"
                         @layout="applyLayout($event)"
                         @addLayout="addLayout($event)"
                         @removeLayout="removeLayout($event)"
@@ -106,7 +106,28 @@
                         @sort="applySortBy($event)"
                         @view="applyView($event)"
                         @goToPage="goToPage($event)"
-                    ></header-filter-section>
+                    >
+                        <template #action v-if="hasActionSlot || action">
+                            <slot name="action">
+                                <v-col cols="auto" class="pl-2">
+                                    <v-tooltip left :disabled="!action.hasOwnProperty('tooltip')">
+                                        <template #activator="{ on }">
+                                            <v-btn fab
+                                                   small
+                                                   :color="action.hasOwnProperty('color') ? action.color : 'primary'"
+                                                   :disabled="action.hasOwnProperty('disabled') ? action.disabled : false"
+                                                   v-on="on"
+                                                   @click="customActionClicked()"
+                                            >
+                                                <v-icon>{{ action.hasOwnProperty('icon') ? action.icon : 'mdi-plus' }}</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <div>{{ action.tooltip }}</div>
+                                    </v-tooltip>
+                                </v-col>
+                            </slot>
+                        </template>
+                    </header-filter-section>
                     <v-row no-gutters justify="end" align="center" class="fill-height" v-else>
                         <v-col cols="auto">
                             <v-menu :nudge-bottom="42" :close-on-content-click="false">
@@ -127,7 +148,28 @@
                                         @sort="applySortBy($event)"
                                         @view="applyView($event)"
                                         @goToPage="goToPage($event)"
-                                    ></header-filter-section>
+                                    >
+                                        <template #action v-if="hasActionSlot || action">
+                                            <slot name="action">
+                                                <v-col cols="auto" class="pl-2">
+                                                    <v-tooltip left :disabled="!action.hasOwnProperty('tooltip')">
+                                                        <template #activator="{ on }">
+                                                            <v-btn fab
+                                                                   x-small
+                                                                   :color="action.hasOwnProperty('color') ? action.color : 'primary'"
+                                                                   :disabled="action.hasOwnProperty('disabled') ? action.disabled : false"
+                                                                   v-on="on"
+                                                                   @click="customActionClicked()"
+                                                            >
+                                                                <v-icon>{{ action.hasOwnProperty('icon') ? action.icon : 'mdi-plus' }}</v-icon>
+                                                            </v-btn>
+                                                        </template>
+                                                        <div>{{ action.tooltip }}</div>
+                                                    </v-tooltip>
+                                                </v-col>
+                                            </slot>
+                                        </template>
+                                    </header-filter-section>
                                 </v-card>
                             </v-menu>
                         </v-col>
@@ -148,7 +190,7 @@
                             <v-icon color="#2EA2EF">mdi-information</v-icon>
                         </v-col>
                         <v-col cols="auto" class="px-1" v-if="hasFilters">
-                            <div>Filters are active in this view</div>
+                            <div>Filters are currently active</div>
                         </v-col>
                         <v-col cols="auto" v-show="!hideAdditionalActions">
                             <v-badge color="primary" bordered overlap :content="Object.keys(selectedMap).length" :value="Object.keys(selectedMap).length > 0">
@@ -169,16 +211,20 @@
             </v-row>
             <v-row no-gutters class="flex-nowrap">
                 <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? `calc(100% - ${actionDrawerWidth}px)` : '100%' }">
-                    <v-card class="overflow-hidden rounded" style="position: relative;" :loading="loading" :disabled="loading">
+                    <v-card class="overflow-hidden" style="position: relative;" :loading="loading" :disabled="loading">
                         <v-simple-table fixed-header :height="page.innerHeight - 230">
                             <template #default>
                                 <thead>
                                 <tr>
-                                    <th class="px-2" style="width: 1%;" v-if="selectable">
+                                    <th class="px-2"
+                                        :class="color"
+                                        style="width: 1%;"
+                                        v-if="selectable"
+                                    >
                                         <v-simple-checkbox
                                             style="transform: translateX(4px);"
                                             class="ma-0 pa-0"
-                                            color="secondary"
+                                            :dark="dark"
                                             :disabled="items.length === 0"
                                             :value="selectedItems.length === items.length && items.length !== 0"
                                             :indeterminate="selectedItems.length > 0 && selectedItems.length < items.length"
@@ -186,24 +232,26 @@
                                             @input="selectAllItems()"
                                         ></v-simple-checkbox>
                                     </th>
-                                    <th :key="index"
+                                    <th :class="color"
+                                        :key="index"
                                         :style="{ borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '' }"
                                         v-for="(column, index) in orderedColumns"
                                         v-show="!column.hidden"
                                     >
                                         <v-row no-gutters>
                                             <v-col cols="auto">
-                                                <div style="white-space: nowrap;">{{ column.label }}</div>
+                                                <div style="white-space: nowrap;" :class="dark ? 'white--text' : 'black--text'">{{ column.label }}</div>
                                             </v-col>
-                                            <v-col cols="auto" class="pl-1" v-if="!!meta.sortBy && meta.sortBy[column.rawValue]">
-                                                <v-btn x-small icon @click="changeSortDirection(column)">
-                                                    <v-icon x-small>{{ meta.sortBy[column.rawValue] === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}</v-icon>
+                                            <v-col cols="auto" class="pl-1" v-if="!!getSortDirection(column)">
+                                                <v-btn x-small icon :color="dark ? 'white' : 'black'" @click="changeSortDirection(column)">
+                                                    <v-icon x-small>{{ getSortDirection(column) === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}</v-icon>
                                                 </v-btn>
                                             </v-col>
                                         </v-row>
                                     </th>
                                     <th style="width: 1%;"
                                         class="px-2"
+                                        :class="color"
                                         :style="{ borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '' }"
                                         v-show="items.length > 0 && actions.length > 0"
                                     ></th>
@@ -328,14 +376,14 @@
                                         <slot name="no-data-with-filters">
                                             <div>Filters you have applied did not return any results.</div>
                                             <div>Please change or remove the filters completely.</div>
-<!--                                            <v-btn block-->
-<!--                                                   class="mt-4"-->
-<!--                                                   color="grey"-->
-<!--                                                   :disabled="loading"-->
-<!--                                                   :dark="!loading"-->
-<!--                                                   @click="applyClear()"-->
-<!--                                            >Clear Filters-->
-<!--                                            </v-btn>-->
+                                            <!--                                            <v-btn block-->
+                                            <!--                                                   class="mt-4"-->
+                                            <!--                                                   color="grey"-->
+                                            <!--                                                   :disabled="loading"-->
+                                            <!--                                                   :dark="!loading"-->
+                                            <!--                                                   @click="applyClear()"-->
+                                            <!--                                            >Clear Filters-->
+                                            <!--                                            </v-btn>-->
                                         </slot>
                                     </div>
                                     <div class="text-center grey--text" v-else>
@@ -347,6 +395,7 @@
                                 </v-col>
                             </v-row>
                         </div>
+                        <div style="height: 5px;" :class="color"></div>
                     </v-card>
                 </v-col>
                 <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? `${actionDrawerWidth}px` : '0px' }">
@@ -419,6 +468,10 @@
                 type: Object,
                 required: true,
             },
+            action: {
+                type: Object | null,
+                default: null,
+            },
             actions: {
                 type: Array,
                 default: () => [],
@@ -450,6 +503,14 @@
             segmented: {
                 type: Boolean,
                 default: false,
+            },
+            dark: {
+                type: Boolean,
+                default: false,
+            },
+            color: {
+                type: String,
+                default: 'primary',
             },
         },
         computed: {
@@ -525,26 +586,25 @@
 
                 return {};
             },
+            hasActionSlot() {
+                return this.$slots.hasOwnProperty('action');
+            },
         },
         watch: {
             selectedMap(val) {
                 if (this.selectable) {
-                    if (!this.itemValue) {
-                        console.error('Prop "item-value" is required when using selectable.');
+                    if (!this.returnObject) {
+                        this.$emit('input', val[this.itemValue]);
                     } else {
-                        if (!this.returnObject) {
-                            this.$emit('input', val[this.itemValue]);
-                        } else {
-                            this.$emit('input', val);
-                        }
+                        this.$emit('input', val);
                     }
                 }
             },
             additionalActionDrawer(val) {
                 if (val) {
-                    this.$emit('drawerOpened', this.selectedItems);
+                    this.$emit('drawer:open', this.selectedItems);
                 } else {
-                    this.$emit('drawerClosed');
+                    this.$emit('drawer:close');
                 }
             },
         },
@@ -651,6 +711,7 @@
                 this.updateMetaSubValue('search', 'initial', true);
                 this.updateMetaSubValue('search', 'queries', {});
                 this.updateMetaSubValue('search', 'term', '');
+                this.updateMeta('page', 1);
 
                 if (this.meta.states.search === 'route') {
                     this.post();
@@ -670,6 +731,7 @@
             applySearch(queries) {
                 this.updateMetaSubValue('search', 'initial', false);
                 this.updateMetaSubValue('search', 'queries', queries);
+                this.updateMeta('page', 1);
 
                 if (this.meta.states.search === 'route') {
                     this.post();
@@ -678,11 +740,13 @@
                 }
             },
             clearFilters() {
+                //TODO: return to page 1
                 this.loading = true;
                 this.updateMeta('filters', {});
                 this.postChanges('filters', {filters: {}});
             },
             applyFilters(filters) {
+                //TODO: return to page 1
                 this.loading = true;
                 this.updateMeta('filters', filters)
                 this.postChanges('filters', {filters: filters});
@@ -727,6 +791,7 @@
             applySortBy(value) {
                 this.loading = true;
                 this.updateMeta('sortBy', value);
+                this.updateMeta('page', 1);
 
                 if (this.meta.states.sort === 'route') {
                     this.post();
@@ -735,24 +800,30 @@
                 }
             },
             changeSortDirection(column) {
-                const order = this.meta.sortBy[column.rawValue] === 'asc' ? 'desc' : 'asc';
-                this.updateMetaSubValue('sortBy', column.rawValue, order);
+                const value = column.isRaw ? column.value : column.rawValue,
+                    order = this.meta.sortBy[value] === 'asc' ? 'desc' : 'asc';
 
+                this.updateMetaSubValue('sortBy', value, order);
                 if (this.meta.states.sort === 'route') {
                     this.post();
                 } else {
                     this.postChanges('sort', {sortBy: this.meta.sortBy});
                 }
             },
+            getSortDirection(column) {
+                const value = column.isRaw ? column.value : column.rawValue;
+
+                return this.meta.sortBy[value];
+            },
             applyView(columns) {
                 this.loading = true;
                 this.updateMeta('columns', columns);
                 this.postChanges('view', {columns: columns});
             },
-            applyClear() {
-                this.loading = true;
-                this.post(true);
-            },
+            // applyClear() {
+            //     this.loading = true;
+            //     this.post(true);
+            // },
             afterPromise() {
                 this.searchQueriesFromArrayToObject();
                 this.closeFilterMenu();
@@ -764,10 +835,12 @@
             getPostDataBasedOnStates() {
                 let data = {};
 
+                if (!!this.meta.currentLayout) {
+                    this.$set(data, 'rl', 1);
+                }
+
                 if (this.meta.states.search === 'route') {
-                    this.$set(data, 'search', {
-                        queries: this.meta.search.queries,
-                    });
+                    this.$set(data, 'search', {queries: this.meta.search.queries});
                 }
 
                 if (this.meta.states.sort === 'route') {
@@ -797,6 +870,7 @@
                     onSuccess: () => {
                         this.setActiveItems();
                         this.afterPromise();
+                        this.handleAfterRemoveLayout();
                     },
                 });
             },
@@ -849,7 +923,11 @@
             },
             emitRowClicked(item, index) {
                 this.$emit('click:row', item);
-                this.clickedRowIndex = index;
+                if (this.clickedRowIndex !== null && this.clickedRowIndex === index) {
+                    this.clickedRowIndex = null;
+                } else {
+                    this.clickedRowIndex = index;
+                }
             },
             handleActionIcon(icon, item) {
                 if (typeof icon === 'string') {
@@ -863,8 +941,30 @@
                     this.afterPostQueries = JSON.parse(JSON.stringify(this.meta.search.queries));
                 }
             },
+            handleAfterRemoveLayout() {
+                const query = new URLSearchParams(window.location.search).get('q');
+                let data = JSON.parse(Buffer.from(query, 'base64').toString());
+
+                if (data.hasOwnProperty('rl')) {
+                    this.$delete(data, 'rl');
+                    let newQueryString = Buffer.from(JSON.stringify(data), 'utf8').toString('base64');
+                    let url = `${window.location.pathname}?q=${newQueryString}`;
+                    window.history.replaceState(null, '', url);
+                }
+            },
+            customActionClicked() {
+                if (this.action.hasOwnProperty('closure')) {
+                    this.action.closure();
+                }
+
+                this.$emit('click:action');
+            },
         },
         mounted() {
+            if (!this.itemValue) {
+                console.error('Prop "item-value" is required when using selectable.');
+            }
+
             this.setPageSizes();
             this.setAfterPostQueries();
         },

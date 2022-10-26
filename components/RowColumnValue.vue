@@ -5,14 +5,14 @@
                 <v-col cols="auto" class="pr-1 flex-shrink-1" v-if="!!column.avatar">
                     <div v-if="!!column.avatar">
                         <v-avatar class="elevation-3" color="grey lighten-2" :size="36">
-                            <div class="mt-1" v-if="!!item.avatar_url">
+                            <div class="mt-1" v-if="!!item[`${column.value}_avatar_url`]">
                                 <v-menu bottom rounded="lg" :nudge-bottom="40" :disabled="!column.avatarPreview">
                                     <template #activator="{ on }">
-                                        <v-img contain :style="{ cursor: !!column.avatarPreview ? 'pointer' : '' }" :width="36" :src="item.avatar_url"
+                                        <v-img contain :style="{ cursor: !!column.avatarPreview ? 'pointer' : '' }" :width="36" :src="item[`${column.value}_avatar_url`]"
                                                v-on="on"></v-img>
                                     </template>
                                     <v-card class="rounded-lg" :width="200" :height="200">
-                                        <v-img contain :width="200" :src="item.avatar_url"></v-img>
+                                        <v-img contain :width="200" :src="item[`${column.value}_avatar_url`]"></v-img>
                                     </v-card>
                                 </v-menu>
                             </div>

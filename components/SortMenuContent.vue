@@ -25,9 +25,9 @@
                         <v-btn icon
                                outlined
                                x-small
-                               :class="sortOptionSelected(column.rawValue) ? 'primary' : ''"
-                               :dark="sortOptionSelected(column.rawValue)"
-                               @click="setSortOptions(column.rawValue)"
+                               :class="sortOptionSelected(column) ? 'primary' : ''"
+                               :dark="sortOptionSelected(column)"
+                               @click="setSortOptions(column)"
                         >
                             <v-icon>mdi-arrow-up</v-icon>
                         </v-btn>
@@ -36,9 +36,9 @@
                         <v-btn icon
                                outlined
                                x-small
-                               :class="sortOptionSelected(column.rawValue, 'desc') ? 'primary' : ''"
-                               :dark="sortOptionSelected(column.rawValue, 'desc')"
-                               @click="setSortOptions(column.rawValue, 'desc')"
+                               :class="sortOptionSelected(column, 'desc') ? 'primary' : ''"
+                               :dark="sortOptionSelected(column, 'desc')"
+                               @click="setSortOptions(column, 'desc')"
                         >
                             <v-icon>mdi-arrow-down</v-icon>
                         </v-btn>
@@ -83,7 +83,7 @@
         },
         data() {
             return {
-                innerSortBy: {},
+                innerSortBy: Map,
             };
         },
         watch: {
@@ -98,13 +98,15 @@
                 if (Object.keys(this.sortBy).length !== 0) {
                     this.innerSortBy = JSON.parse(JSON.stringify(this.sortBy));
                 } else {
-                    this.innerSortBy = {};
+                    this.innerSortBy = Map;
                 }
             },
             sortIndex(column) {
-                return Object.keys(this.innerSortBy).findIndex((key) => key === column.rawValue);
+                const value = column.isRaw ? column.value : column.rawValue;
+                return Object.keys(this.innerSortBy).findIndex((key) => key === value);
             },
-            setSortOptions(value, direction = 'asc') {
+            setSortOptions(column, direction = 'asc') {
+                const value = column.isRaw ? column.value : column.rawValue;
                 if (this.innerSortBy[value]) {
                     if (direction === this.innerSortBy[value]) {
                         this.$delete(this.innerSortBy, value);
@@ -115,7 +117,8 @@
                     this.$set(this.innerSortBy, value, direction);
                 }
             },
-            sortOptionSelected(value, direction = 'asc') {
+            sortOptionSelected(column, direction = 'asc') {
+                const value = column.isRaw ? column.value : column.rawValue;
                 return !!this.innerSortBy[value] && this.innerSortBy[value] === direction;
             },
             emitSortBy() {
