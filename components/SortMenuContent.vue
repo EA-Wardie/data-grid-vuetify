@@ -83,14 +83,12 @@
         },
         data() {
             return {
-                innerSortBy: Map,
+                innerSortBy: {},
             };
         },
         watch: {
-            sortBy(val) {
-                if (Object.values(val).length !== Object.values(this.innerSortBy).length) {
-                    this.cloneInner();
-                }
+            sortBy() {
+                this.cloneInner();
             },
         },
         methods: {
@@ -98,7 +96,7 @@
                 if (Object.keys(this.sortBy).length !== 0) {
                     this.innerSortBy = JSON.parse(JSON.stringify(this.sortBy));
                 } else {
-                    this.innerSortBy = Map;
+                    this.innerSortBy = {};
                 }
             },
             sortIndex(column) {
@@ -107,12 +105,8 @@
             },
             setSortOptions(column, direction = 'asc') {
                 const value = column.isRaw ? column.value : column.rawValue;
-                if (this.innerSortBy[value]) {
-                    if (direction === this.innerSortBy[value]) {
-                        this.$delete(this.innerSortBy, value);
-                    } else {
-                        this.$set(this.innerSortBy, value, direction);
-                    }
+                if (this.innerSortBy[value] && direction === this.innerSortBy[value]) {
+                    this.$delete(this.innerSortBy, value);
                 } else {
                     this.$set(this.innerSortBy, value, direction);
                 }

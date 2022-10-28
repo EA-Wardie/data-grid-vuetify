@@ -11,7 +11,7 @@
                         <div class="subtitle-2"
                              style="white-space: nowrap;"
                              :style="{ color: column.hidden ? 'dimgrey' : 'black' }"
-                        >{{ column.label }}{{ !!column.iconConditionRawValue ? ' (icon)' : '' }}
+                        >{{ column.label }}{{ !!column.iconConditionRawValue ? '(icon)' : '' }}
                         </div>
                     </td>
                     <td class="py-2 pl-3">
@@ -26,9 +26,9 @@
                                         clearable
                                         :disabled="column.hidden"
                                         :items="getEnumValues(column.enumerators)"
-                                        :value="!!filters[column.rawValue] ? filters[column.rawValue].value : null"
-                                        @input="selectEnum(column.rawValue, $event)"
-                                        @click:clear="clearEnum(column.rawValue)"
+                                        :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].value : null"
+                                        @input="selectEnum(getColumnValue(column), $event)"
+                                        @click:clear="clearEnum(getColumnValue(column))"
                                     ></v-autocomplete>
                                 </div>
                                 <div v-else-if="column.type === 'number' || column.type === 'perc'">
@@ -41,8 +41,8 @@
                                                 hide-details
                                                 :disabled="column.hidden"
                                                 :items="numberOperators"
-                                                :value="!!filters[column.rawValue] ? filters[column.rawValue].operator : null"
-                                                @input="selectOperator(column.rawValue, $event)"
+                                                :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].operator : null"
+                                                @input="selectOperator(getColumnValue(column), $event)"
                                             ></v-autocomplete>
                                         </v-col>
                                         <v-col cols="8">
@@ -54,11 +54,11 @@
                                                 outlined
                                                 clearable
                                                 type="number"
-                                                :value="!!filters[column.rawValue] ? filters[column.rawValue].value : null"
+                                                :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].value : null"
                                                 :label="column.type === 'number' ? 'Value' : 'Percentage'"
-                                                :disabled="!filters[column.rawValue] || !filters[column.rawValue].operator || column.hidden"
-                                                @input="selectNumber(column.rawValue, $event, column.type)"
-                                                @click:clear="clearOperator(column.rawValue)"
+                                                :disabled="!filters[getColumnValue(column)] || !filters[getColumnValue(column)].operator || column.hidden"
+                                                @input="selectNumber(getColumnValue(column), $event)"
+                                                @click:clear="clearOperator(getColumnValue(column))"
                                             ></v-text-field>
                                         </v-col>
                                     </v-row>
@@ -73,8 +73,8 @@
                                                 hide-details
                                                 :disabled="column.hidden"
                                                 :items="timestampOperators"
-                                                :value="!!filters[column.rawValue] ? filters[column.rawValue].operator : null"
-                                                @input="selectOperator(column.rawValue, $event)"
+                                                :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].operator : null"
+                                                @input="selectOperator(getColumnValue(column), $event)"
                                             ></v-autocomplete>
                                         </v-col>
                                         <v-col cols="8">
@@ -83,7 +83,7 @@
                                                 offset-y
                                                 min-width="auto"
                                                 :close-on-content-click="false"
-                                                v-model="pickers[column.rawValue]"
+                                                v-model="pickers[getColumnValue(column)]"
                                             >
                                                 <template v-slot:activator="{ on, attrs }">
                                                     <v-text-field
@@ -94,17 +94,17 @@
                                                         dense
                                                         outlined
                                                         clearable
-                                                        :disabled="!filters[column.rawValue] || !filters[column.rawValue].operator || column.hidden"
-                                                        :value="getFormattedTimestampValue(column.rawValue)"
+                                                        :disabled="!filters[getColumnValue(column)] || !filters[getColumnValue(column)].operator || column.hidden"
+                                                        :value="getFormattedTimestampValue(getColumnValue(column))"
                                                         v-bind="attrs"
                                                         v-on="on"
-                                                        @click:clear="clearOperator(column.rawValue)"
+                                                        @click:clear="clearOperator(getColumnValue(column))"
                                                     ></v-text-field>
                                                 </template>
                                                 <v-date-picker
                                                     color="primary"
-                                                    :value="!!filters[column.rawValue] ? filters[column.rawValue].value : null"
-                                                    @input="selectTimestamp(column.rawValue, $event)"
+                                                    :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].value : null"
+                                                    @input="selectTimestamp(getColumnValue(column), $event)"
                                                 ></v-date-picker>
                                             </v-menu>
                                         </v-col>
@@ -153,6 +153,114 @@
                         </v-row>
                     </td>
                 </tr>
+                <tr :key="index+'_sub'" v-for="(column, index) in subtitleColumns">
+                    <td class="py-2">
+                        <div class="subtitle-2"
+                             style="white-space: nowrap;"
+                             :style="{ color: column.hidden ? 'dimgrey' : 'black' }"
+                        >{{ column.subtitleLabel }}
+                        </div>
+                    </td>
+                    <td class="py-2 pl-3">
+                        <v-row no-gutters justify="end">
+                            <v-col cols="auto">
+                                <div v-if="column.subtitleType === 'enum'">
+                                    <v-autocomplete
+                                        dense
+                                        outlined
+                                        label="Value"
+                                        hide-details
+                                        clearable
+                                        :disabled="column.hidden"
+                                        :items="getEnumValues(column.enumerators)"
+                                        :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].value : null"
+                                        @input="selectEnum(getSubtitleColumnValue(column), $event)"
+                                        @click:clear="clearEnum(getSubtitleColumnValue(column))"
+                                    ></v-autocomplete>
+                                </div>
+                                <div v-else-if="column.subtitleType === 'number'">
+                                    <v-row dense class="flex-nowrap">
+                                        <v-col cols="4">
+                                            <v-autocomplete
+                                                dense
+                                                outlined
+                                                label="Operator"
+                                                hide-details
+                                                :disabled="column.hidden"
+                                                :items="numberOperators"
+                                                :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].operator : null"
+                                                @input="selectOperator(getSubtitleColumnValue(column), $event)"
+                                            ></v-autocomplete>
+                                        </v-col>
+                                        <v-col cols="8">
+                                            <v-text-field
+                                                hide-spin-buttons
+                                                prepend-inner-icon="mdi-counter"
+                                                hide-details
+                                                dense
+                                                outlined
+                                                clearable
+                                                type="number"
+                                                label="Value"
+                                                :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].value : null"
+                                                :disabled="!filters[getSubtitleColumnValue(column)] || !filters[getSubtitleColumnValue(column)].operator || column.hidden"
+                                                @input="selectNumber(getSubtitleColumnValue(column), $event)"
+                                                @click:clear="clearOperator(getSubtitleColumnValue(column))"
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </div>
+                                <div v-else-if="column.subtitleType === 'timestamp'">
+                                    <v-row dense class="flex-nowrap">
+                                        <v-col cols="4">
+                                            <v-autocomplete
+                                                dense
+                                                outlined
+                                                label="Operator"
+                                                hide-details
+                                                :disabled="column.hidden"
+                                                :items="timestampOperators"
+                                                :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].operator : null"
+                                                @input="selectOperator(getSubtitleColumnValue(column), $event)"
+                                            ></v-autocomplete>
+                                        </v-col>
+                                        <v-col cols="8">
+                                            <v-menu
+                                                transition="scale-transition"
+                                                offset-y
+                                                min-width="auto"
+                                                :close-on-content-click="false"
+                                                v-model="pickers[getSubtitleColumnValue(column)]"
+                                            >
+                                                <template v-slot:activator="{ on, attrs }">
+                                                    <v-text-field
+                                                        label="Date"
+                                                        prepend-inner-icon="mdi-calendar"
+                                                        readonly
+                                                        hide-details
+                                                        dense
+                                                        outlined
+                                                        clearable
+                                                        :disabled="!filters[getSubtitleColumnValue(column)] || !filters[getSubtitleColumnValue(column)].operator || column.hidden"
+                                                        :value="getFormattedTimestampValue(getSubtitleColumnValue(column))"
+                                                        v-bind="attrs"
+                                                        v-on="on"
+                                                        @click:clear="clearOperator(getSubtitleColumnValue(column))"
+                                                    ></v-text-field>
+                                                </template>
+                                                <v-date-picker
+                                                    color="primary"
+                                                    :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].value : null"
+                                                    @input="selectTimestamp(getSubtitleColumnValue(column), $event)"
+                                                ></v-date-picker>
+                                            </v-menu>
+                                        </v-col>
+                                    </v-row>
+                                </div>
+                            </v-col>
+                        </v-row>
+                    </td>
+                </tr>
             </table>
         </div>
         <v-divider></v-divider>
@@ -192,13 +300,20 @@
                 type: Boolean,
                 default: false,
             },
+            types: {
+                type: Array,
+                default: () => [],
+            },
         },
         computed: {
             advancedColumns() {
-                return this.columns.filter(({isAdvanced, hidden}) => isAdvanced).concat(this.extraColumns);
+                return this.columns.filter(({isAdvanced}) => isAdvanced).concat(this.extraColumns);
             },
             extraColumns() {
                 return this.columns.filter(({iconConditionRawValue}) => !!iconConditionRawValue);
+            },
+            subtitleColumns() {
+                return this.columns.filter(({subtitle, subtitleType}) => !!subtitle && this.types.includes(subtitleType));
             },
         },
         data() {
@@ -222,36 +337,20 @@
             getFilteredIconMap(iconMap) {
                 return iconMap.filter(({operator}) => operator !== null);
             },
-            initFilters(withPickers = true) {
-                this.advancedColumns.forEach((column) => {
-                    if (column.type === 'icon') {
-                        this.$set(this.filters, `${column.rawValue}_icon`, {});
-                    } else if (column.type !== 'icon') {
-                        if (!column.iconConditionRawValue) {
-                            this.$set(this.filters, column.rawValue, {});
-                        } else {
-                            this.$set(this.filters, `${column.iconConditionRawValue}_icon`, {});
-                        }
-                    }
-
-                    if (withPickers) {
-                        this.$set(this.pickers, column.rawValue, false);
-                        this.$set(this.pickers, column.rawValue, false);
-                    }
-                });
-            },
             setExistingFilters() {
                 const keys = Object.keys(this.data);
 
                 if (keys.length > 0) {
                     keys.forEach((key) => {
-                        if (!!this.data[key].value || !!this.data[key].operator || !!this.data[key].type) {
-                            this.setFilter(key, this.data[key].value, this.data[key].operator, this.data[key].type);
-                        } else {
-                            this.$set(this.filters, key, {});
-                        }
+                        this.setFilter(key, this.data[key].value, this.data[key].operator);
                     });
                 }
+            },
+            getColumnValue(column) {
+                return column.isRaw ? column.value : column.rawValue;
+            },
+            getSubtitleColumnValue(column) {
+                return column.subtitleIsRaw ? column.subtitle : column.rawSubtitle;
             },
             getEnumValues(items) {
                 return Object.keys(items).map((key) => {
@@ -261,41 +360,40 @@
                 });
             },
             getFormattedTimestampValue(value) {
-                if (!this.filters[value] || !this.filters[value]['value']) {
+                if (!this.filters[value] || !this.filters[value].value) {
                     return null;
                 } else {
-                    return this.$options.filters.humanDate(this.filters[value]['value'], 'D MMMM YYYY');
+                    return this.$options.filters.humanDate(this.filters[value].value, 'D MMMM YYYY');
                 }
             },
             getSelectedIcon(column) {
                 let icons = column.iconMap,
-                    filter = this.filters[`${column.rawValue}_icon`];
+                    filter = this.filters[`${this.getColumnValue(column)}_icon`];
 
                 if (!filter && !!column.iconConditionRawValue) {
                     filter = this.filters[`${column.iconConditionRawValue}_icon`];
                 }
 
-                return icons.find(({value, operator}) => {
-                    let op = operator;
-                    if (operator === '===') {
-                        op = '=';
-                    }
+                if (filter) {
+                    return icons.find(({value, operator}) => {
+                        return filter.value === value && filter.operator === operator
+                    });
+                }
 
-                    return filter.value === value && filter.operator === op
-                });
+                return null;
             },
             composeIcon(icon) {
                 return icon.includes('mdi-') ? icon : `mdi-${icon}`;
             },
             selectIcon(column, icon) {
-                const value = !column.iconConditionRawValue ? column.rawValue : column.iconConditionRawValue;
+                const value = !column.iconConditionRawValue ? this.getColumnValue(column) : column.iconConditionRawValue;
                 this.setFilter(`${value}_icon`, icon.value, icon.operator, 'icon');
             },
             selectOperator(value, operator) {
                 this.setFilter(value, null, operator, 'timestamp');
             },
-            selectNumber(value, number, type) {
-                this.setFilter(value, number, this.filters[value].operator, type);
+            selectNumber(value, number) {
+                this.setFilter(value, number, this.filters[value].operator);
             },
             selectTimestamp(value, timestamp) {
                 this.setFilter(value, timestamp, this.filters[value].operator, 'timestamp');
@@ -308,35 +406,37 @@
 
                 this.clearing = false;
             },
-            setFilter(key, value, operator, type) {
-                if (!this.filters[key]) {
-                    this.$set(this.filters, key, {});
-                }
+            setFilter(key, value = null, operator = null) {
+                if (value === null && operator === null) {
+                    this.$delete(this.filters, key);
+                } else {
+                    if (!this.filters[key]) {
+                        this.$set(this.filters, key, {});
+                    }
 
-                this.$set(this.filters[key], 'value', value);
-                this.$set(this.filters[key], 'operator', operator);
+                    this.$set(this.filters[key], 'value', value);
+                    this.$set(this.filters[key], 'operator', operator);
+                }
             },
             clearEnum(value) {
                 this.clearing = true;
-                this.$set(this.filters, value, {});
+                this.setFilter(value);
             },
             clearOperator(value) {
-                this.$set(this.filters[value], 'operator', null);
+                this.setFilter(value);
             },
             clearIcon(column) {
-                const value = !column.iconConditionRawValue ? column.rawValue : column.iconConditionRawValue;
-                this.$set(this.filters, `${value}_icon`, {});
+                const value = !column.iconConditionRawValue ? this.getColumnValue(column) : column.iconConditionRawValue;
+                this.setFilter(`${value}_icon`);
             },
             clearFilters() {
-                this.initFilters(false);
                 this.$emit('clear');
             },
             emitFilters() {
                 this.$emit('filters', this.filters);
             },
         },
-        beforeMount() {
-            this.initFilters();
+        mounted() {
             this.setExistingFilters();
         },
     }

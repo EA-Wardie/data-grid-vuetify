@@ -60,6 +60,7 @@
                                                                 :data="meta.filters"
                                                                 :columns="meta.columns"
                                                                 :has-layout="hasLayout"
+                                                                :types="meta.advancedColumnTypes"
                                                                 v-if="menus.filter"
                                                                 @filters="applyFilters($event)"
                                                                 @clear="clearFilters()"
@@ -196,7 +197,7 @@
                             <v-badge color="primary" bordered overlap :content="Object.keys(selectedMap).length" :value="Object.keys(selectedMap).length > 0">
                                 <v-tooltip color="grey" left :nudge-right="5" :disabled="Object.keys(selectedMap).length === 0">
                                     <template #activator="{ on }">
-                                        <v-btn icon v-on="on" @click="additionalActionDrawer = !additionalActionDrawer">
+                                        <v-btn icon v-on="on" @click="toggleDrawer()">
                                             <v-icon :color="additionalActionDrawer ? 'primary' : ''"
                                             >{{ additionalActionDrawer ? 'mdi-menu-open' : 'mdi-menu' }}
                                             </v-icon>
@@ -224,7 +225,7 @@
                                         <v-simple-checkbox
                                             style="transform: translateX(4px);"
                                             class="ma-0 pa-0"
-                                            :dark="dark"
+                                            :dark="!dark"
                                             :disabled="items.length === 0"
                                             :value="selectedItems.length === items.length && items.length !== 0"
                                             :indeterminate="selectedItems.length > 0 && selectedItems.length < items.length"
@@ -234,16 +235,16 @@
                                     </th>
                                     <th :class="color"
                                         :key="index"
-                                        :style="{ borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '' }"
+                                        :style="{ borderLeft: segmented ? '1px solid rgba(0,0,0,0.12) !important' : '' }"
                                         v-for="(column, index) in orderedColumns"
                                         v-show="!column.hidden"
                                     >
                                         <v-row no-gutters>
                                             <v-col cols="auto">
-                                                <div style="white-space: nowrap;" :class="dark ? 'white--text' : 'black--text'">{{ column.label }}</div>
+                                                <div style="white-space: nowrap;" :class="!dark ? 'white--text' : 'black--text'">{{ column.label }}</div>
                                             </v-col>
                                             <v-col cols="auto" class="pl-1" v-if="!!getSortDirection(column)">
-                                                <v-btn x-small icon :color="dark ? 'white' : 'black'" @click="changeSortDirection(column)">
+                                                <v-btn x-small icon :color="!dark ? 'white' : 'black'" @click="changeSortDirection(column)">
                                                     <v-icon x-small>{{ getSortDirection(column) === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}</v-icon>
                                                 </v-btn>
                                             </v-col>
@@ -252,7 +253,6 @@
                                     <th style="width: 1%;"
                                         class="px-2"
                                         :class="color"
-                                        :style="{ borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '' }"
                                         v-show="items.length > 0 && actions.length > 0"
                                     ></th>
                                 </tr>
@@ -512,6 +512,10 @@
                 type: String,
                 default: 'primary',
             },
+            drawer: {
+                type: Boolean,
+                default: false,
+            },
         },
         computed: {
             items() {
@@ -527,7 +531,7 @@
                 return (!!this.meta.search && !!this.afterPostQueries && Object.keys(this.afterPostQueries).length > 0);
             },
             hasFilters() {
-                return (Object.keys(this.meta.filters).length > 0);
+                return Object.values(this.meta.filters).filter((filter) => !Array.isArray(filter)).length > 0;
             },
             hasLayout() {
                 return this.meta.layouts.findIndex(({current}) => current) !== -1;
@@ -600,7 +604,11 @@
                     }
                 }
             },
+            drawer(val) {
+                this.additionalActionDrawer = val;
+            },
             additionalActionDrawer(val) {
+                this.$emit('drawer', val);
                 if (val) {
                     this.$emit('drawer:open', this.selectedItems);
                 } else {
@@ -922,12 +930,13 @@
                 }, 250);
             },
             emitRowClicked(item, index) {
-                this.$emit('click:row', item);
                 if (this.clickedRowIndex !== null && this.clickedRowIndex === index) {
                     this.clickedRowIndex = null;
                 } else {
                     this.clickedRowIndex = index;
                 }
+
+                this.$emit('click:row', this.clickedRowIndex ? item : null);
             },
             handleActionIcon(icon, item) {
                 if (typeof icon === 'string') {
@@ -959,9 +968,15 @@
 
                 this.$emit('click:action');
             },
+            toggleDrawer() {
+                this.additionalActionDrawer = !this.additionalActionDrawer;
+                if (!this.additionalActionDrawer) {
+                    this.clickedRowIndex = null;
+                }
+            },
         },
         mounted() {
-            if (!this.itemValue) {
+            if (this.selectable && !this.itemValue) {
                 console.error('Prop "item-value" is required when using selectable.');
             }
 
