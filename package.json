@@ -1,7 +1,7 @@
 {
   "name": "data-grid-vuetify",
   "description": "Front-end complementary package for the data-grid-laravel package of the same name.",
-  "version": "1.0",
+  "version": "1.0.0",
   "main" : "index.js",
   "module": "index.js",
   "author": {
