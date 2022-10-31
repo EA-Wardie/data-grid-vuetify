@@ -98,7 +98,7 @@
                     <header-filter-section
                         :current-total-items="items.length"
                         :meta-data="meta"
-                        v-if="page.innerWidth > 1399"
+                        v-if="page.innerWidth > (hasLayouts ? 1399 : 1299)"
                         @layout="applyLayout($event)"
                         @addLayout="addLayout($event)"
                         @removeLayout="removeLayout($event)"
@@ -134,7 +134,7 @@
                             <v-menu :nudge-bottom="42" :close-on-content-click="false">
                                 <template #activator="{ on }">
                                     <v-btn fab small color="primary" v-on="on">
-                                        <v-icon>mdi-menu</v-icon>
+                                        <v-icon>mdi-dots-vertical</v-icon>
                                     </v-btn>
                                 </template>
                                 <v-card class="px-2">
@@ -532,6 +532,9 @@
             },
             hasFilters() {
                 return Object.values(this.meta.filters).filter((filter) => !Array.isArray(filter)).length > 0;
+            },
+            hasLayouts() {
+                return this.meta.layouts.length > 0;
             },
             hasLayout() {
                 return this.meta.layouts.findIndex(({current}) => current) !== -1;
