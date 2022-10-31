@@ -936,7 +936,7 @@
                     this.clickedRowIndex = index;
                 }
 
-                this.$emit('click:row', this.clickedRowIndex ? item : null);
+                this.$emit('click:row', this.clickedRowIndex !== null ? item : null);
             },
             handleActionIcon(icon, item) {
                 if (typeof icon === 'string') {
