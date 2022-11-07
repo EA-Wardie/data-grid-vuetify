@@ -17,14 +17,14 @@ export function getRecommendations(columns, term) {
                 text: `${column.label} contains "${term}"`,
                 value: value,
             });
+        }
 
-            if ((column.hasOwnProperty('subtitle') && !!column.subtitle) || (column.hasOwnProperty('rawSubtitle') && !!column.rawSubtitle)) {
-                const subtitle = column.subtitleIsRaw ? column.subtitle : column.rawSubtitle;
-                recommendations.push({
-                    text: `${column.subtitleLabel} contains "${term}"`,
-                    value: subtitle,
-                });
-            }
+        if ((!!column.subtitle || !!column.rawSubtitle) && !column.hidden && column.searchable && !!term) {
+            const subtitle = column.subtitleIsRaw ? column.subtitle : column.rawSubtitle;
+            recommendations.push({
+                text: `${column.subtitleLabel} contains "${term}"`,
+                value: subtitle,
+            });
         }
     });
 

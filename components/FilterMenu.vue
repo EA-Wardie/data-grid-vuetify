@@ -1,17 +1,22 @@
 <template>
     <div>
         <div class="pa-4">
-            <v-alert dense text outlined color="grey" type="info" v-if="hasLayout">
-                Some filters are disabled because a view is active
-            </v-alert>
+            <!--            <v-alert dense text outlined color="grey" type="info" v-if="hasLayout">-->
+            <!--                Some filters are disabled because a view is active-->
+            <!--            </v-alert>-->
             <div class="mb-2 font-weight-bold black--text">Filters</div>
             <table style="width: 100%;">
                 <tr :key="index" v-for="(column, index) in advancedColumns">
                     <td class="py-2">
                         <div class="subtitle-2"
-                             style="white-space: nowrap;"
-                             :style="{ color: column.hidden ? 'dimgrey' : 'black' }"
-                        >{{ column.label }}{{ !!column.iconConditionRawValue ? '(icon)' : '' }}
+                             style="max-width: 170px; word-break: break-word; line-height: 1.1;"
+                             v-if="!column.iconConditionRawValue"
+                        >{{ column.label }}
+                        </div>
+                        <div class="subtitle-2"
+                             style="max-width: 170px; word-break: break-word; line-height: 1.1;"
+                             v-else
+                        >{{ !!column.iconMap[0] && column.iconMap[0].label ? column.iconMap[0].label : `${column.label} (I)` }}
                         </div>
                     </td>
                     <td class="py-2 pl-3">
@@ -24,7 +29,7 @@
                                         label="Value"
                                         hide-details
                                         clearable
-                                        :disabled="column.hidden"
+                                        no-data-text="No Items"
                                         :items="getEnumValues(column.enumerators)"
                                         :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].value : null"
                                         @input="selectEnum(getColumnValue(column), $event)"
@@ -39,7 +44,7 @@
                                                 outlined
                                                 label="Operator"
                                                 hide-details
-                                                :disabled="column.hidden"
+                                                no-data-text="No Items"
                                                 :items="numberOperators"
                                                 :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].operator : null"
                                                 @input="selectOperator(getColumnValue(column), $event)"
@@ -56,7 +61,7 @@
                                                 type="number"
                                                 :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].value : null"
                                                 :label="column.type === 'number' ? 'Value' : 'Percentage'"
-                                                :disabled="!filters[getColumnValue(column)] || !filters[getColumnValue(column)].operator || column.hidden"
+                                                :disabled="!filters[getColumnValue(column)] || !filters[getColumnValue(column)].operator"
                                                 @input="selectNumber(getColumnValue(column), $event)"
                                                 @click:clear="clearOperator(getColumnValue(column))"
                                             ></v-text-field>
@@ -71,7 +76,7 @@
                                                 outlined
                                                 label="Operator"
                                                 hide-details
-                                                :disabled="column.hidden"
+                                                no-data-text="No Items"
                                                 :items="timestampOperators"
                                                 :value="!!filters[getColumnValue(column)] ? filters[getColumnValue(column)].operator : null"
                                                 @input="selectOperator(getColumnValue(column), $event)"
@@ -94,7 +99,7 @@
                                                         dense
                                                         outlined
                                                         clearable
-                                                        :disabled="!filters[getColumnValue(column)] || !filters[getColumnValue(column)].operator || column.hidden"
+                                                        :disabled="!filters[getColumnValue(column)] || !filters[getColumnValue(column)].operator"
                                                         :value="getFormattedTimestampValue(getColumnValue(column))"
                                                         v-bind="attrs"
                                                         v-on="on"
@@ -119,8 +124,8 @@
                                                         flat
                                                         class="rounded"
                                                         style="border: 1px solid rgba(0,0,0,0.4); width: 40px; height: 40px; cursor: pointer; padding: 6px;"
-                                                        :disabled="column.hidden"
-                                                        v-ripple v-on="on"
+                                                        v-ripple
+                                                        v-on="on"
                                                     >
                                                         <v-icon :color="getSelectedIcon(column).color" v-if="!!getSelectedIcon(column)">
                                                             {{ composeIcon(getSelectedIcon(column).icon) }}
@@ -171,7 +176,7 @@
                                         label="Value"
                                         hide-details
                                         clearable
-                                        :disabled="column.hidden"
+                                        no-data-text="No Items"
                                         :items="getEnumValues(column.enumerators)"
                                         :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].value : null"
                                         @input="selectEnum(getSubtitleColumnValue(column), $event)"
@@ -186,7 +191,7 @@
                                                 outlined
                                                 label="Operator"
                                                 hide-details
-                                                :disabled="column.hidden"
+                                                no-data-text="No Items"
                                                 :items="numberOperators"
                                                 :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].operator : null"
                                                 @input="selectOperator(getSubtitleColumnValue(column), $event)"
@@ -203,7 +208,7 @@
                                                 type="number"
                                                 label="Value"
                                                 :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].value : null"
-                                                :disabled="!filters[getSubtitleColumnValue(column)] || !filters[getSubtitleColumnValue(column)].operator || column.hidden"
+                                                :disabled="!filters[getSubtitleColumnValue(column)] || !filters[getSubtitleColumnValue(column)].operator"
                                                 @input="selectNumber(getSubtitleColumnValue(column), $event)"
                                                 @click:clear="clearOperator(getSubtitleColumnValue(column))"
                                             ></v-text-field>
@@ -218,7 +223,7 @@
                                                 outlined
                                                 label="Operator"
                                                 hide-details
-                                                :disabled="column.hidden"
+                                                no-data-text="No Items"
                                                 :items="timestampOperators"
                                                 :value="!!filters[getSubtitleColumnValue(column)] ? filters[getSubtitleColumnValue(column)].operator : null"
                                                 @input="selectOperator(getSubtitleColumnValue(column), $event)"
@@ -241,7 +246,7 @@
                                                         dense
                                                         outlined
                                                         clearable
-                                                        :disabled="!filters[getSubtitleColumnValue(column)] || !filters[getSubtitleColumnValue(column)].operator || column.hidden"
+                                                        :disabled="!filters[getSubtitleColumnValue(column)] || !filters[getSubtitleColumnValue(column)].operator"
                                                         :value="getFormattedTimestampValue(getSubtitleColumnValue(column))"
                                                         v-bind="attrs"
                                                         v-on="on"
@@ -342,6 +347,9 @@
 
                 if (keys.length > 0) {
                     keys.forEach((key) => {
+                        if (this.data[key].operator === '=') {
+                            this.data[key].operator = '===';
+                        }
                         this.setFilter(key, this.data[key].value, this.data[key].operator);
                     });
                 }
@@ -393,7 +401,11 @@
                 this.setFilter(value, null, operator, 'timestamp');
             },
             selectNumber(value, number) {
-                this.setFilter(value, number, this.filters[value].operator);
+                if (this.filters[value]) {
+                    this.setFilter(value, number, this.filters[value].operator);
+                } else {
+                    this.setFilter(value, null, null);
+                }
             },
             selectTimestamp(value, timestamp) {
                 this.setFilter(value, timestamp, this.filters[value].operator, 'timestamp');
@@ -433,11 +445,16 @@
                 this.$emit('clear');
             },
             emitFilters() {
+                this.filterOutBrokenFilters();
                 this.$emit('filters', this.filters);
+            },
+            filterOutBrokenFilters() {
+                this.filters = Object.fromEntries(Object.entries(this.filters).filter(([key]) => this.filters[key].value !== null));
             },
         },
         mounted() {
             this.setExistingFilters();
+            console.log(this.columns);
         },
     }
 </script>

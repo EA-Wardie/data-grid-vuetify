@@ -2,7 +2,7 @@
     <v-fade-transition>
         <div :style="{ width: `${width}px` }" v-show="value">
             <v-card class="ml-4" :width="width - 16" :height="height">
-                <div class="overflow-y-auto overflow-x-hidden" style="max-height: calc(100% - 41px);">
+                <div class="overflow-y-auto overflow-x-hidden" style="max-height: 100%;">
                     <div class="pa-3" style="white-space: nowrap;">
                         <slot></slot>
                     </div>

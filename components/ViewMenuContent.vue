@@ -41,7 +41,12 @@
                            v-if="remove.confirm && remove.id === layout.id"
                            @click.stop="removeCustomView(layout)"
                     >
-                        <v-icon>mdi-check</v-icon>
+                        <v-tooltip top>
+                            <template #activator="{ on }">
+                                <v-icon v-on="on">mdi-check</v-icon>
+                            </template>
+                            <div>Remove View?</div>
+                        </v-tooltip>
                     </v-btn>
                 </v-list-item-action>
             </v-list-item>

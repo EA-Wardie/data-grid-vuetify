@@ -10,8 +10,8 @@
                     <v-row no-gutters align="center" class="flex-nowrap">
                         <v-col cols="auto">
                             <v-menu bottom
-                                    :max-width="500"
-                                    :min-width="500"
+                                    :max-width="600"
+                                    :min-width="600"
                                     :nudge-bottom="58"
                                     :close-on-content-click="false"
                                     v-model="menus.search"
@@ -39,8 +39,8 @@
                                                 <template #append v-if="advancedColumns.length > 0 || hasFilters">
                                                     <v-menu bottom
                                                             left
-                                                            :max-width="500"
-                                                            :min-width="500"
+                                                            :max-width="600"
+                                                            :min-width="600"
                                                             :nudge-bottom="47"
                                                             :nudge-right="12"
                                                             :close-on-content-click="false"
@@ -55,7 +55,7 @@
                                                                 <v-icon>mdi-tune</v-icon>
                                                             </v-btn>
                                                         </template>
-                                                        <v-card :width="500">
+                                                        <v-card :width="600">
                                                             <filter-menu
                                                                 :data="meta.filters"
                                                                 :columns="meta.columns"
@@ -81,7 +81,7 @@
                                         </div>
                                     </v-badge>
                                 </template>
-                                <v-card :width="500">
+                                <v-card :width="600">
                                     <search-menu
                                         :value="menus.search"
                                         :data="meta.search"
@@ -178,8 +178,8 @@
                 </v-col>
             </v-row>
         </v-card>
-        <div style="margin-top: 72px;">
-            <v-row no-gutters justify="space-between" align="center" class="mb-3">
+        <div style="margin-top: 62px;">
+            <v-row no-gutters justify="space-between" align="center" class="mb-1">
                 <v-col cols="auto">
                     <slot name="title">
                         <div class="title">Items</div>
@@ -213,7 +213,7 @@
             <v-row no-gutters class="flex-nowrap">
                 <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? `calc(100% - ${actionDrawerWidth}px)` : '100%' }">
                     <v-card class="overflow-hidden" style="position: relative;" :loading="loading" :disabled="loading">
-                        <v-simple-table fixed-header :height="page.innerHeight - 230">
+                        <v-simple-table fixed-header :height="page.innerHeight - 240">
                             <template #default>
                                 <thead>
                                 <tr>
@@ -237,7 +237,6 @@
                                         :key="index"
                                         :style="{ borderLeft: segmented ? '1px solid rgba(0,0,0,0.12) !important' : '' }"
                                         v-for="(column, index) in orderedColumns"
-                                        v-show="!column.hidden"
                                     >
                                         <v-row no-gutters>
                                             <v-col cols="auto">
@@ -287,7 +286,6 @@
                                             borderBottom: segmented && rowIndex === items.length - 1 ? '1px solid rgba(0,0,0,0.12)' : '',
                                         }"
                                         v-for="(column, colIndex) in orderedColumns"
-                                        v-show="!column.hidden"
                                     >
                                         <slot :name="column.isRaw ? column.value : column.rawValue"
                                               :column="column"
@@ -348,7 +346,7 @@
                                                    :color="actions[0].color || 'primary'"
                                                    :disabled="actions[0].disabled || false"
                                                    v-if="!!actions[0] && actions[0].show ? actions[0].show(item) : true"
-                                                   @click="actions[0].confirmation ? confirmClosure(actions[0], item) : actions[0].closure(item)"
+                                                   @click.stop="actions[0].confirmation ? confirmClosure(actions[0], item) : actions[0].closure(item)"
                                             >{{ actions[0].label }}
                                             </v-btn>
                                         </div>
@@ -362,28 +360,11 @@
                              v-if="items.length === 0"
                         >
                             <v-row no-gutters justify="center" align="center" class="fill-height">
-                                <v-col cols="auto">
-                                    <div>
-                                        <v-row no-gutters justify="center">
-                                            <v-col cols="auto">
-                                                <v-img :width="150"
-                                                       :src="`/icons/data-display-system/${hasFilters || hasSearch ? 'no_filter_items' : 'no_items'}.svg`"
-                                                ></v-img>
-                                            </v-col>
-                                        </v-row>
-                                    </div>
+                                <v-col cols="auto" style="font-size: 19px;">
                                     <div class="text-center grey--text" v-if="hasFilters || hasSearch">
                                         <slot name="no-data-with-filters">
                                             <div>Filters you have applied did not return any results.</div>
                                             <div>Please change or remove the filters completely.</div>
-                                            <!--                                            <v-btn block-->
-                                            <!--                                                   class="mt-4"-->
-                                            <!--                                                   color="grey"-->
-                                            <!--                                                   :disabled="loading"-->
-                                            <!--                                                   :dark="!loading"-->
-                                            <!--                                                   @click="applyClear()"-->
-                                            <!--                                            >Clear Filters-->
-                                            <!--                                            </v-btn>-->
                                         </slot>
                                     </div>
                                     <div class="text-center grey--text" v-else>
@@ -525,7 +506,7 @@
                 return this.data.metaData;
             },
             orderedColumns() {
-                return this.meta.columns.sort((a, b) => (a.index > b.index) ? 1 : ((b.index > a.index) ? -1 : 0));
+                return this.meta.columns.filter(({hidden}) => !hidden).sort((a, b) => (a.index > b.index) ? 1 : ((b.index > a.index) ? -1 : 0));
             },
             hasSearch() {
                 return (!!this.meta.search && !!this.afterPostQueries && Object.keys(this.afterPostQueries).length > 0);
@@ -877,7 +858,7 @@
 
                 this.$inertia.reload({
                     data: payload,
-                    preserveScroll: true,
+                    preserveScroll: false,
                     onSuccess: () => {
                         this.setActiveItems();
                         this.afterPromise();
@@ -891,7 +872,7 @@
                     this.$route(`datagrid.${action}`, [ref]),
                     data,
                     {
-                        preserveScroll: true,
+                        preserveScroll: false,
                         preserveState: false,
                         onSuccess: () => {
                             this.setActiveItems();
@@ -975,6 +956,14 @@
                 this.additionalActionDrawer = !this.additionalActionDrawer;
                 if (!this.additionalActionDrawer) {
                     this.clickedRowIndex = null;
+                }
+            },
+            showColumn(column) {
+                const key = column.isRaw ? column.value : column.rawValue;
+                if (this.meta.filters.hasOwnProperty(key)) {
+                    return true;
+                } else {
+                    return !column.hidden;
                 }
             },
         },
