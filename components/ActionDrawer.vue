@@ -1,7 +1,7 @@
 <template>
     <v-fade-transition>
         <div :style="{ width: `${width}px` }" v-show="value">
-            <v-card class="ml-4" :width="width - 16" :height="height">
+            <v-card class="ml-4" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;" :width="width - 16" :height="height">
                 <div class="overflow-y-auto overflow-x-hidden" style="max-height: 100%;">
                     <div class="pa-3" style="white-space: nowrap;">
                         <slot></slot>
@@ -24,6 +24,10 @@
                     </div>
                 </div>
             </v-card>
+            <div style="height: 5px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;"
+                 class="ml-4"
+                 :style="{ width: `${width - 16}px` }"
+                 :class="color"></div>
         </div>
     </v-fade-transition>
 </template>
@@ -51,6 +55,10 @@
             selectedItems: {
                 type: Array,
                 default: () => [],
+            },
+            color: {
+                type: String,
+                default: 'primary',
             },
         },
     }

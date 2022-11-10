@@ -1,6 +1,9 @@
 <template>
     <div style="width: 200px;">
-        <div class="subtitle-2 black--text mb-1">Pre-defined Views</div>
+        <div class="subtitle-2 black--text mb-1"
+             v-if="predefinedLayouts.length > 0"
+        >Pre-defined Views
+        </div>
         <v-list-item
             dense
             class="px-3 list-item-outlined"
@@ -14,7 +17,10 @@
                 <v-list-item-title>{{ layout.label }}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
-        <div class="subtitle-2 black--text mb-1 mt-2">Custom Views</div>
+        <div class="subtitle-2 black--text mb-1"
+             :class="predefinedLayouts.length > 0 ? 'mt-2' : ''"
+        >Custom Views
+        </div>
         <div :key="`cus_${index}`" v-for="(layout, index) in customLayouts">
             <v-list-item
                 dense
@@ -74,10 +80,12 @@
                     v-model="create.label"
                     v-if="create.state === 'input'"
                     @blur="resetAddView()"
+                    @focus="removeCurrentSelectedView()"
                     @keyup.enter="addNewView()"
                 >
                     <template #append>
                         <v-icon style="cursor: pointer; margin: 1px;"
+                                :disabled="!create.label"
                                 :color="!!create.label ? 'success' : 'grey'"
                                 @click="addNewView()"
                         >mdi-check
@@ -171,6 +179,16 @@
             resetAddView() {
                 this.create.label = null;
                 this.create.state = 'button';
+
+                const existingView = this.layouts.find(({current}) => current);
+
+                if (existingView) {
+                    const view = this.innerLayouts.find(({id}) => id === existingView.id);
+
+                    if (view) {
+                        this.$set(view, 'current', true);
+                    }
+                }
             },
             addNewView() {
                 const layout = {
@@ -187,6 +205,13 @@
                 this.$emit('remove', layout);
                 this.remove.confirm = false;
                 this.remove.id = null;
+            },
+            removeCurrentSelectedView() {
+                const view = this.innerLayouts.find(({current}) => current);
+
+                if (view) {
+                    this.$set(view, 'current', false);
+                }
             },
         },
         beforeMount() {

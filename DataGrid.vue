@@ -2,8 +2,11 @@
     <div>
         <v-card tile
                 class="py-4 px-6"
-                style="position: absolute; top: 0; left: 0; user-select: none;"
-                width="100%"
+                style="position: fixed; top: 64px; user-select: none; z-index: 3;"
+                :style="{
+                    width: drawerIsMini ? 'calc(100% - 56px)' : 'calc(100% - 250px)',
+                    left: drawerIsMini ? '56px' : '250px'
+                }"
         >
             <v-row no-gutters justify="space-between" align="center" class="fill-height flex-nowrap">
                 <v-col cols="auto" class="flex-shrink-1">
@@ -213,13 +216,14 @@
             <v-row no-gutters class="flex-nowrap">
                 <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? `calc(100% - ${actionDrawerWidth}px)` : '100%' }">
                     <v-card class="overflow-hidden" style="position: relative;" :loading="loading" :disabled="loading">
-                        <v-simple-table fixed-header :height="page.innerHeight - 240">
+                        <v-simple-table fixed-header :height="!shrinkTable ? page.innerHeight - 220 : undefined">
                             <template #default>
                                 <thead>
                                 <tr>
                                     <th class="px-2"
-                                        :class="color"
                                         style="width: 1%;"
+                                        :class="color"
+                                        :style="{ borderRight: segmented ? '1px solid rgba(0,0,0,0.12) !important' : '' }"
                                         v-if="selectable"
                                     >
                                         <v-simple-checkbox
@@ -235,7 +239,7 @@
                                     </th>
                                     <th :class="color"
                                         :key="index"
-                                        :style="{ borderLeft: segmented ? '1px solid rgba(0,0,0,0.12) !important' : '' }"
+                                        :style="{ borderRight: segmented ? '1px solid rgba(0,0,0,0.12) !important' : '' }"
                                         v-for="(column, index) in orderedColumns"
                                     >
                                         <v-row no-gutters>
@@ -268,7 +272,10 @@
                                 >
                                     <td class="px-2"
                                         style="width: 1%;"
-                                        :style="{ borderBottom: segmented && rowIndex === items.length - 1 ? '1px solid rgba(0,0,0,0.12)' : '' }"
+                                        :style="{
+                                            borderRight: segmented ? '1px solid rgba(0,0,0,0.12)' : '',
+                                            borderBottom: segmented && rowIndex === items.length - 1 ? '1px solid rgba(0,0,0,0.12)' : ''
+                                        }"
                                         v-if="selectable"
                                     >
                                         <v-simple-checkbox
@@ -282,7 +289,7 @@
                                     </td>
                                     <td :key="colIndex"
                                         :style="{
-                                            borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '',
+                                            borderRight: segmented ? '1px solid rgba(0,0,0,0.12)' : '',
                                             borderBottom: segmented && rowIndex === items.length - 1 ? '1px solid rgba(0,0,0,0.12)' : '',
                                         }"
                                         v-for="(column, colIndex) in orderedColumns"
@@ -300,10 +307,10 @@
                                             ></row-column-value>
                                         </slot>
                                     </td>
+                                    <!--                                    borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '',-->
                                     <td class="px-2"
                                         style="width: 1%;"
                                         :style="{
-                                            borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '',
                                             borderBottom: segmented && rowIndex === items.length - 1 ? '1px solid rgba(0,0,0,0.12)' : ''
                                         }"
                                         v-show="items.length > 0 && actions.length > 0"
@@ -355,12 +362,11 @@
                                 </tbody>
                             </template>
                         </v-simple-table>
-                        <div style="position: absolute; top: 0; left: 0; width: 100%;"
-                             :style="{height: `${page.innerHeight - 230}px`}"
+                        <div style="width: 100%; height: 64px;"
                              v-if="items.length === 0"
                         >
                             <v-row no-gutters justify="center" align="center" class="fill-height">
-                                <v-col cols="auto" style="font-size: 19px;">
+                                <v-col cols="auto" style="font-size: 17px;">
                                     <div class="text-center grey--text" v-if="hasFilters || hasSearch">
                                         <slot name="no-data-with-filters">
                                             <div>Filters you have applied did not return any results.</div>
@@ -370,7 +376,6 @@
                                     <div class="text-center grey--text" v-else>
                                         <slot name="no-data">
                                             <div>This page does not have any data yet.</div>
-                                            <div>Please check back soon!</div>
                                         </slot>
                                     </div>
                                 </v-col>
@@ -378,12 +383,13 @@
                         </div>
                         <div style="height: 5px;" :class="color"></div>
                     </v-card>
+                    <slot name="append"></slot>
                 </v-col>
                 <v-col cols="auto" style="transition: width 0.25s;" :style="{ width: additionalActionDrawer ? `${actionDrawerWidth}px` : '0px' }">
                     <action-drawer
                         :width="actionDrawerWidth"
                         :value="additionalActionDrawer"
-                        :height="page.innerHeight - 230"
+                        :height="page.innerHeight - 220"
                         :actions="additionalActions"
                         :selected-items="returnObject ? Object.values(selectedMap) : Object.keys(selectedMap)"
                     >
@@ -497,6 +503,10 @@
                 type: Boolean,
                 default: false,
             },
+            closeDrawerOnDataChanges: {
+                type: Boolean,
+                default: false,
+            },
         },
         computed: {
             items() {
@@ -534,6 +544,13 @@
             },
             totalCurrentFilters() {
                 return Object.values(this.meta.filters).filter((filter) => !Array.isArray(filter)).length;
+            },
+            shrinkTable() {
+                const height = this.page.innerHeight - 220;
+                return !(height <= this.items.length * 48);
+            },
+            drawerIsMini() {
+                return this.page.innerWidth < 1680;
             },
             confirmAction() {
                 if (!!this.actionClosure && !!this.actionClosure.action && !!this.actionClosure.action.confirmation) {
@@ -822,6 +839,11 @@
                 this.closeSearchMenu();
                 this.setAfterPostQueries();
 
+                if (this.closeDrawerOnDataChanges) {
+                    this.additionalActionDrawer = false;
+                    this.clickedRowIndex = null;
+                }
+
                 this.loading = false;
             },
             getPostDataBasedOnStates() {
@@ -979,8 +1001,8 @@
             this.registerEvents();
         },
         created() {
-            this.debouncedPaginate = debounce(this.paginate, 250);
-            this.debouncedInitialSearch = debounce(this.applyInitialSearch, 500);
+            this.debouncedPaginate = debounce(this.paginate, 200);
+            this.debouncedInitialSearch = debounce(this.applyInitialSearch, 200);
         },
         beforeDestroy() {
             this.destroyEvents();

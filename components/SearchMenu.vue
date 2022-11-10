@@ -25,6 +25,13 @@
         </div>
         <v-divider></v-divider>
         <v-card-actions class="px-4 py-3">
+            <v-expand-x-transition>
+                <div class="subtitle-2 grey--text"
+                     style="white-space: nowrap;"
+                     v-if="!!data.term && Object.keys(data.queries).length === 0"
+                >Select at least one recommendation above
+                </div>
+            </v-expand-x-transition>
             <v-spacer></v-spacer>
             <v-btn small
                    color="grey"
@@ -34,6 +41,7 @@
             </v-btn>
             <v-btn small
                    color="primary"
+                   :disabled="Object.keys(data.queries).length === 0"
                    @click="emitSearch()"
             >Search
             </v-btn>

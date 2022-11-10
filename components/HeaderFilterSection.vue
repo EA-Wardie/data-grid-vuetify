@@ -49,7 +49,7 @@
                 </header-filter-action>
             </div>
         </v-col>
-        <v-col cols="auto">
+        <v-col cols="auto" v-if="metaData.totalItems > 0">
             <div class="px-1">
                 <header-filter-action style="line-height: 1.1;" icon="mdi-format-list-bulleted-square" :hide-action="metaData.totalPages <= 1">
                     <div class="text-center">{{ paginationText }}</div>

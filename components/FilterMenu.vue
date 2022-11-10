@@ -120,16 +120,28 @@
                                         <template #activator="{ on }">
                                             <v-row no-gutters align="center" class="flex-nowrap">
                                                 <v-col cols="auto">
+                                                    <v-expand-x-transition>
+                                                        <div class="mr-3" style="height: 24px; white-space: nowrap;"
+                                                             v-if="!!getSelectedIcon(column) && !!getSelectedIcon(column).tooltip"
+                                                        >{{ getSelectedIcon(column).tooltip }}
+                                                        </div>
+                                                    </v-expand-x-transition>
+                                                </v-col>
+                                                <v-col cols="auto">
                                                     <v-card
                                                         flat
                                                         class="rounded"
-                                                        style="border: 1px solid rgba(0,0,0,0.4); width: 40px; height: 40px; cursor: pointer; padding: 6px;"
+                                                        style="border: 1px solid rgba(0,0,0,0.4); width: 40px; height: 40px; cursor: pointer;"
                                                         v-ripple
                                                         v-on="on"
                                                     >
-                                                        <v-icon :color="getSelectedIcon(column).color" v-if="!!getSelectedIcon(column)">
-                                                            {{ composeIcon(getSelectedIcon(column).icon) }}
-                                                        </v-icon>
+                                                        <v-row no-gutters justify="center" align="center" class="fill-height">
+                                                            <v-col cols="auto">
+                                                                <v-icon :color="getSelectedIcon(column).color" v-if="!!getSelectedIcon(column)">
+                                                                    {{ composeIcon(getSelectedIcon(column).icon) }}
+                                                                </v-icon>
+                                                            </v-col>
+                                                        </v-row>
                                                     </v-card>
                                                 </v-col>
                                                 <v-col cols="auto" class="pl-1">
@@ -145,8 +157,18 @@
                                             <div :key="index" v-for="(icon, index) in getFilteredIconMap(column.iconMap)" @click="selectIcon(column, icon)">
                                                 <v-hover>
                                                     <template #default="{ hover }">
-                                                        <div class="pa-3" style="cursor: pointer;" :class="hover ? 'grey lighten-3' : ''">
-                                                            <v-icon :color="icon.color">{{ composeIcon(icon.icon) }}</v-icon>
+                                                        <div :class="hover ? 'grey lighten-3' : ''">
+                                                            <v-tooltip right :disabled="!icon.tooltip">
+                                                                <template #activator="{ on }">
+                                                                    <div class="pa-3"
+                                                                         style="cursor: pointer;"
+                                                                         v-on="on"
+                                                                    >
+                                                                        <v-icon :color="icon.color" v-on="on">{{ composeIcon(icon.icon) }}</v-icon>
+                                                                    </div>
+                                                                </template>
+                                                                <div>{{ icon.tooltip }}</div>
+                                                            </v-tooltip>
                                                         </div>
                                                     </template>
                                                 </v-hover>
@@ -454,7 +476,6 @@
         },
         mounted() {
             this.setExistingFilters();
-            console.log(this.columns);
         },
     }
 </script>

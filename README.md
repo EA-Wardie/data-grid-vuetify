@@ -94,9 +94,17 @@ The `hide-additional-actions` hides the action's drawer if it is not being used.
 The `value` property is used to get the current selected items on the data-grid.
 For auto synced values use `v-model` instead.
 
-#### `v-drawer`
-The `v-drawer` directive can be used to mutate the additional actions drawer state from outside.
-Simply pass a data property to this directive and change it as needed.
+#### `drawer`
+The `drawer` property can be used to mutate the additional actions drawer state from outside.
+Simply pass a data property to this property and change it as needed.
+
+#### `close-drawer-on-data-changes`
+The `close-drawer-on-data-changes` property can be used to force close the drawer when any data changes occur.
+Data changes can include but are not limited to:
+- Applying a search query
+- Applying a filter
+- Sorting data
+- Changing pages
 
 ### Events
 
