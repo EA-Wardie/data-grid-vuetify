@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 200px;">
+    <div style="min-width: 251px;">
         <div class="subtitle-2 black--text mb-1"
              v-if="predefinedLayouts.length > 0"
         >Pre-defined Views
@@ -57,7 +57,7 @@
                 </v-list-item-action>
             </v-list-item>
         </div>
-        <div class="mt-2">
+        <div class="mt-2" style="height: 42px;">
             <v-expand-transition>
                 <v-btn text
                        block
@@ -67,7 +67,9 @@
                        :height="42"
                        v-if="create.state === 'button'"
                        @click="initAddView()"
-                >Add View
+                >
+                    <v-icon small>mdi-plus</v-icon>
+                    Add View
                 </v-btn>
             </v-expand-transition>
             <v-expand-transition>
@@ -84,11 +86,8 @@
                     @keyup.enter="addNewView()"
                 >
                     <template #append>
-                        <v-icon style="cursor: pointer; margin: 1px;"
-                                :disabled="!create.label"
-                                :color="!!create.label ? 'success' : 'grey'"
-                                @click="addNewView()"
-                        >mdi-check
+                        <v-icon :color="newViewLabelIsValid ? 'success' : 'grey'">
+                            mdi-check
                         </v-icon>
                     </template>
                 </v-text-field>
@@ -108,6 +107,7 @@
                 <v-btn block
                        small
                        color="primary"
+                       :disabled="!selected && !create.label"
                        @click="emitValue()"
                 >Apply
                 </v-btn>
@@ -124,6 +124,10 @@
                 type: Array,
                 required: true,
             },
+            value: {
+                type: Boolean,
+                default: false,
+            },
         },
         computed: {
             predefinedLayouts() {
@@ -131,6 +135,11 @@
             },
             customLayouts() {
                 return this.innerLayouts.filter(({custom, id}) => custom && id !== 'custom_hidden');
+            },
+            newViewLabelIsValid() {
+                return !!this.create.label
+                    && this.create.label.length > 2
+                    && !this.innerLayouts.map(i => i['label']).includes(this.create.label);
             },
         },
         data() {
@@ -164,22 +173,23 @@
                 this.selected = selected;
             },
             emitValue(id) {
-                if (id === null) {
-                    this.$emit('layout', null);
-                } else if (!this.selected) {
-                    const found = this.innerLayouts.find(({current}) => current);
-                    this.selected = found ? found.id : null;
-                }
+                if (this.create && this.create.label) {
+                    this.addNewView();
+                } else {
+                    if (id === null) {
+                        this.$emit('layout', null);
+                    } else if (!this.selected) {
+                        const found = this.innerLayouts.find(({current}) => current);
+                        this.selected = found ? found.id : null;
+                    }
 
-                this.$emit('layout', this.selected);
+                    this.$emit('layout', this.selected);
+                }
             },
             initAddView() {
                 this.create.state = 'input';
             },
             resetAddView() {
-                this.create.label = null;
-                this.create.state = 'button';
-
                 const existingView = this.layouts.find(({current}) => current);
 
                 if (existingView) {
@@ -214,7 +224,19 @@
                 }
             },
         },
-        beforeMount() {
+        watch: {
+            layouts: {
+                deep: true,
+                handler() {
+                    this.cloneInner();
+                },
+            },
+            value() {
+                this.create.label = null;
+                this.create.state = 'button';
+            },
+        },
+        mounted() {
             this.cloneInner();
         },
     }

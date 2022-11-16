@@ -1,7 +1,7 @@
 <template>
-    <div style="width: 200px;">
+    <div style="min-width: 200px;">
         <div class="subtitle-2 mb-1">Columns</div>
-        <draggable handle=".handle" v-model="innerColumns" @end="updateOrder()">
+        <draggable handle=".handle" v-model="innerColumns" @start="dragging = true" @end="updateOrder()">
             <v-list-item
                 dense
                 class="px-3 list-item-outlined handle"
@@ -16,11 +16,11 @@
                 </v-list-item-content>
                 <v-list-item-action class="ml-4 my-0">
                     <v-btn icon small @click="switchHidden(column)">
-                        <v-icon>{{ column.hidden ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
+                        <v-icon>{{ column.hidden ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}</v-icon>
                     </v-btn>
                 </v-list-item-action>
                 <v-list-item-icon class="ml-2 mt-2 mb-0">
-                    <v-icon>mdi-drag-horizontal-variant</v-icon>
+                    <v-icon :style="{ cursor: dragging ? 'grabbing' : 'grab' }">mdi-drag</v-icon>
                 </v-list-item-icon>
             </v-list-item>
         </draggable>
@@ -52,6 +52,7 @@
         data() {
             return {
                 innerColumns: [],
+                dragging: false,
             };
         },
         methods: {
@@ -66,6 +67,8 @@
                     column.index = index;
                     return column;
                 });
+
+                this.dragging = false;
             },
             clearChanges() {
                 this.innerColumns = this.innerColumns.map((column) => {

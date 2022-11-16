@@ -10,9 +10,9 @@
         </v-list-item-content>
         <v-list-item-action class="ml-1" v-if="!hideAction">
             <slot name="action">
-                <v-menu bottom :value="value" :nudge-bottom="32" :close-on-content-click="false" @input="emitValue($event)">
+                <v-menu left :value="value" :nudge-bottom="32" :close-on-content-click="false" @input="emitValue($event)">
                     <template #activator="{ on }">
-                        <v-btn icon small v-on="on">
+                        <v-btn icon small style="border-radius: 4px;" v-ripple="false" v-on="on">
                             <v-icon>{{ actionIcon }}</v-icon>
                         </v-btn>
                     </template>

@@ -11,7 +11,7 @@ export const debounce = (func, delay) => {
 export function getRecommendations(columns, term) {
     const recommendations = [];
     columns.forEach((column) => {
-        if (!column.hidden && !column.isAdvanced && column.searchable && !!term) {
+        if (!column.isAdvanced && column.searchable && !!term) {
             const value = column.isRaw ? column.value : column.rawValue;
             recommendations.push({
                 text: `${column.label} contains "${term}"`,
@@ -19,7 +19,7 @@ export function getRecommendations(columns, term) {
             });
         }
 
-        if ((!!column.subtitle || !!column.rawSubtitle) && !column.hidden && column.searchable && !!term) {
+        if ((!!column.subtitle || !!column.rawSubtitle) && column.searchable && !!term) {
             const subtitle = column.subtitleIsRaw ? column.subtitle : column.rawSubtitle;
             recommendations.push({
                 text: `${column.subtitleLabel} contains "${term}"`,

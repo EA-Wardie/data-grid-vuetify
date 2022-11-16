@@ -51,8 +51,9 @@
                                                     >
                                                         <template #activator="{ on }">
                                                             <v-btn icon
-                                                                   style="transform: translateY(-6px);"
+                                                                   style="transform: translateY(-6px); border-radius: 4px;"
                                                                    :color="hasFilters ? 'secondary' : 'grey'"
+                                                                   v-ripple="false"
                                                                    v-on="on"
                                                             >
                                                                 <v-icon>mdi-tune</v-icon>
@@ -110,6 +111,7 @@
                         @sort="applySortBy($event)"
                         @view="applyView($event)"
                         @goToPage="goToPage($event)"
+                        @itemsPerPage="applyItemsPerPage($event)"
                     >
                         <template #action v-if="hasActionSlot || action">
                             <slot name="action">
@@ -152,6 +154,7 @@
                                         @sort="applySortBy($event)"
                                         @view="applyView($event)"
                                         @goToPage="goToPage($event)"
+                                        @itemsPerPage="applyItemsPerPage($event)"
                                     >
                                         <template #action v-if="hasActionSlot || action">
                                             <slot name="action">
@@ -307,7 +310,6 @@
                                             ></row-column-value>
                                         </slot>
                                     </td>
-                                    <!--                                    borderLeft: segmented ? '1px solid rgba(0,0,0,0.12)' : '',-->
                                     <td class="px-2"
                                         style="width: 1%;"
                                         :style="{
@@ -316,10 +318,12 @@
                                         v-show="items.length > 0 && actions.length > 0"
                                     >
                                         <div v-if="actions.length > 1">
-                                            <v-menu bottom :nudge-bottom="32" :min-width="120">
+                                            <v-menu left :nudge-bottom="32" :min-width="120">
                                                 <template #activator="{ on, value }">
-                                                    <v-btn icon small color="primary" v-on="on">
-                                                        <v-icon small>{{ value ? 'mdi-dots-vertical-circle-outline' : 'mdi-dots-vertical' }}</v-icon>
+                                                    <v-btn icon small style="border-radius: 4px;" v-ripple="false" v-on="on">
+                                                        <v-icon color="primary" :style="{ transform: value ? 'rotate(90deg)' : '' }">
+                                                            mdi-menu-right
+                                                        </v-icon>
                                                     </v-btn>
                                                 </template>
                                                 <v-card width="100%">
@@ -790,11 +794,16 @@
                 this.updateMeta('page', page);
                 this.paginate();
             },
+            applyItemsPerPage(items) {
+                this.updateMeta('page', 1);
+                this.updateMeta('itemsPerPage', items);
+                this.paginate();
+            },
             paginate() {
                 if (this.meta.states.page === 'route') {
                     this.post();
                 } else {
-                    this.postChanges('page', {page: this.meta.page});
+                    this.postChanges('page', {page: this.meta.page, itemsPerPage: this.meta.itemsPerPage});
                 }
             },
             applySortBy(value) {
@@ -863,6 +872,7 @@
 
                 if (this.meta.states.page === 'route') {
                     this.$set(data, 'page', this.meta.page);
+                    this.$set(data, 'itemsPerPage', this.meta.itemsPerPage);
                 }
 
                 return data;

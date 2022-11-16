@@ -1,6 +1,6 @@
 <template>
     <v-row no-gutters justify="end" align="center" class="fill-height flex-nowrap">
-        <v-col cols="auto" v-if="metaData.layouts.length > 0">
+        <v-col cols="auto">
             <div class="px-1">
                 <header-filter-action
                     icon="mdi-table-edit"
@@ -10,6 +10,7 @@
                     <template #menu>
                         <view-menu-content
                             :layouts="metaData.layouts"
+                            v-model="layoutMenu"
                             @layout="emitLayout($event)"
                             @add="emitLayoutAdd($event)"
                             @remove="emitLayoutRemove($event)"
@@ -57,12 +58,24 @@
                     <template #action>
                         <v-row no-gutters align="center" class="fill-height">
                             <v-col cols="auto">
-                                <v-btn small icon :disabled="metaData.page === 1" @click="emitPageDown()">
+                                <v-btn small
+                                       icon
+                                       style="border-radius: 4px;"
+                                       :disabled="metaData.page === 1"
+                                       v-ripple="false"
+                                       @click="emitPageDown()"
+                                >
                                     <v-icon>mdi-chevron-left</v-icon>
                                 </v-btn>
                             </v-col>
                             <v-col cols="auto" class="pl-1">
-                                <v-btn small icon :disabled="metaData.page === metaData.totalPages" @click="emitPageUp()">
+                                <v-btn small
+                                       icon
+                                       style="border-radius: 4px;"
+                                       :disabled="metaData.page === metaData.totalPages"
+                                       v-ripple="false"
+                                       @click="emitPageUp()"
+                                >
                                     <v-icon>mdi-chevron-right</v-icon>
                                 </v-btn>
                             </v-col>
@@ -85,7 +98,9 @@
                         <template #menu>
                             <page-menu-content
                                 :total-pages="metaData.totalPages"
+                                :items-per-page="metaData.itemsPerPage"
                                 @go="emitGoToPage($event)"
+                                @itemsPerPage="emitItemsPerPage($event)"
                             ></page-menu-content>
                         </template>
                     </header-filter-action>
@@ -197,10 +212,26 @@
                 this.$emit('goToPage', page);
                 this.pageToMenu = false;
             },
+            emitItemsPerPage(items) {
+                this.$emit('itemsPerPage', items);
+                this.pageToMenu = false;
+            },
         },
     }
 </script>
 
 <style scoped>
+    /*.hover {*/
+    /*    cursor: pointer;*/
+    /*    transition: background-color 0.2s;*/
+    /*    border-radius: 5px;*/
+    /*}*/
 
+    /*.hover:hover {*/
+    /*    background-color: rgba(0, 0, 0, 0.1);*/
+    /*}*/
+
+    /*.hover:active {*/
+    /*    background-color: rgba(0, 0, 0, 0.2);*/
+    /*}*/
 </style>

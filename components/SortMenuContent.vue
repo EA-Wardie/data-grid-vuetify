@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 200px;">
+    <div style="min-width: 200px;">
         <div class="subtitle-2 mb-1">Sort By</div>
         <v-list-item
             dense
