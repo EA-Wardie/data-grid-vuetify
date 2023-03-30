@@ -452,7 +452,7 @@
         },
         props: {
             value: {
-                type: Array,
+                type: Array | Object,
                 default: () => [],
             },
             data: {
@@ -603,7 +603,7 @@
             selectedMap(val) {
                 if (this.selectable) {
                     if (!this.returnObject) {
-                        this.$emit('input', val[this.itemValue]);
+                        this.$emit('input', Object.keys(val));
                     } else {
                         this.$emit('input', val);
                     }
@@ -658,7 +658,12 @@
             },
             setSelectedItem(item) {
                 this.$set(item, 'selected', !item.selected);
-                this.$set(this.selectedMap, item[this.itemValue], item);
+
+                if (this.selectedMap.hasOwnProperty(item[this.itemValue])) {
+                    this.$delete(this.selectedMap, item[this.itemValue]);
+                } else {
+                    this.$set(this.selectedMap, item[this.itemValue], item);
+                }
             },
             selectAllItems() {
                 if (this.selectedItems.length === this.items.length) {
