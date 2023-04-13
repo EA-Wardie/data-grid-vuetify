@@ -1,9 +1,6 @@
 <template>
     <div>
         <div class="pa-4">
-            <!--            <v-alert dense text outlined color="grey" type="info" v-if="hasLayout">-->
-            <!--                Some filters are disabled because a view is active-->
-            <!--            </v-alert>-->
             <div class="mb-2 font-weight-bold black--text">Filters</div>
             <table style="width: 100%;">
                 <tr :key="index" v-for="(column, index) in advancedColumns">
@@ -369,8 +366,8 @@
 
                 if (keys.length > 0) {
                     keys.forEach((key) => {
-                        if (this.data[key].operator === '=') {
-                            this.data[key].operator = '===';
+                        if (this.data[key].operator === '===') {
+                            this.data[key].operator = '=';
                         }
                         this.setFilter(key, this.data[key].value, this.data[key].operator);
                     });
@@ -417,10 +414,10 @@
             },
             selectIcon(column, icon) {
                 const value = !column.iconConditionRawValue ? this.getColumnValue(column) : column.iconConditionRawValue;
-                this.setFilter(`${value}_icon`, icon.value, icon.operator, 'icon');
+                this.setFilter(`${value}_icon`, icon.value, icon.operator);
             },
             selectOperator(value, operator) {
-                this.setFilter(value, null, operator, 'timestamp');
+                this.setFilter(value, null, operator);
             },
             selectNumber(value, number) {
                 if (this.filters[value]) {
@@ -430,12 +427,12 @@
                 }
             },
             selectTimestamp(value, timestamp) {
-                this.setFilter(value, timestamp, this.filters[value].operator, 'timestamp');
+                this.setFilter(value, timestamp, this.filters[value].operator);
                 this.pickers[value] = false;
             },
             selectEnum(value, item) {
                 if (!this.clearing) {
-                    this.setFilter(value, item, '=', 'enum');
+                    this.setFilter(value, item, '=');
                 }
 
                 this.clearing = false;
@@ -467,7 +464,7 @@
                 this.$emit('clear');
             },
             emitFilters() {
-                this.filterOutBrokenFilters();
+                // this.filterOutBrokenFilters();
                 this.$emit('filters', this.filters);
             },
             filterOutBrokenFilters() {

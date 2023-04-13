@@ -3,10 +3,7 @@
         <v-card tile
                 class="py-4 px-6"
                 style="position: fixed; top: 64px; user-select: none; z-index: 3;"
-                :style="{
-                    width: drawerIsMini ? 'calc(100% - 56px)' : 'calc(100% - 250px)',
-                    left: drawerIsMini ? '56px' : '250px'
-                }"
+                :style="{ width: `${barWidth}px`, left: `${$vuetify.application.left}px` }"
         >
             <v-row no-gutters justify="space-between" align="center" class="fill-height flex-nowrap">
                 <v-col cols="auto" class="flex-shrink-1">
@@ -643,11 +640,23 @@
                 afterPostQueries: {},
                 selectedMap: {},
                 clickedRowIndex: null,
+                barWidth: 0,
             };
         },
         methods: {
             registerEvents() {
                 window.addEventListener('resize', debounce(this.setPageSizes, 500));
+
+                setTimeout(() => {
+                    const headEls = Array.from(document.getElementsByClassName('v-app-bar'));
+                    if (headEls.length > 0) {
+                        new ResizeObserver((entries) => {
+                            if (entries[0]) {
+                                this.barWidth = entries[0].contentRect.width;
+                            }
+                        }).observe(headEls[0]);
+                    }
+                }, 0);
             },
             destroyEvents() {
                 window.removeEventListener('resize', this.setPageSizes);
@@ -758,15 +767,13 @@
                 }
             },
             clearFilters() {
-                //TODO: return to page 1
                 this.loading = true;
                 this.updateMeta('filters', {});
                 this.postChanges('filters', {filters: {}});
             },
             applyFilters(filters) {
-                //TODO: return to page 1
                 this.loading = true;
-                this.updateMeta('filters', filters)
+                this.updateMeta('filters', filters);
                 this.postChanges('filters', {filters: filters});
             },
             applyLayout(layout) {
@@ -843,10 +850,6 @@
                 this.updateMeta('columns', columns);
                 this.postChanges('view', {columns: columns});
             },
-            // applyClear() {
-            //     this.loading = true;
-            //     this.post(true);
-            // },
             afterPromise() {
                 this.searchQueriesFromArrayToObject();
                 this.closeFilterMenu();
